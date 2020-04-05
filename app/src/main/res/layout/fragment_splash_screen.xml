@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SplashScreenFragment">
+
+    <TextView
+        android:id="@+id/pokeBattle_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_pokebattle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/explanation_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/label_explanation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pokeBattle_textView" />
+
+    <TextView
+        android:id="@+id/madeBy_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/label_made_by"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/explanation_textView" />
+
+    <TextView
+        android:id="@+id/oceane_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text="@string/app_owner_oceane"
+        app:layout_constraintStart_toEndOf="@+id/madeBy_textView"
+        app:layout_constraintTop_toTopOf="@+id/madeBy_textView" />
+
+    <TextView
+        android:id="@+id/nicolas_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_owner_nicolas"
+        app:layout_constraintStart_toStartOf="@+id/oceane_textView"
+        app:layout_constraintTop_toBottomOf="@+id/oceane_textView" />
+
+    <TextView
+        android:id="@+id/baptiste_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_owner_baptiste"
+        app:layout_constraintStart_toStartOf="@+id/nicolas_textView"
+        app:layout_constraintTop_toBottomOf="@+id/nicolas_textView" />
+
+    <TextView
+        android:id="@+id/antonin_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_owner_antonin"
+        app:layout_constraintStart_toStartOf="@+id/baptiste_textView"
+        app:layout_constraintTop_toBottomOf="@+id/baptiste_textView" />
+
+    <Button
+        android:id="@+id/btn_battle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/btn_battle"
+        app:layout_constraintEnd_toStartOf="@+id/btn_fight"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/antonin_textView" />
+
+    <Button
+        android:id="@+id/btn_fight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_fight"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btn_battle"
+        app:layout_constraintTop_toTopOf="@+id/btn_battle" />
+
+    <TextView
+        android:id="@+id/madeAt_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:text="@string/label_made_at"
+        app:layout_constraintBottom_toBottomOf="@+id/epita_imageView"
+        app:layout_constraintEnd_toStartOf="@+id/epita_imageView"
+        app:layout_constraintTop_toTopOf="@+id/epita_imageView" />
+
+    <ImageView
+        android:id="@+id/epita_imageView"
+        android:layout_width="125dp"
+        android:layout_height="85dp"
+        android:contentDescription="@string/picture_description_epita"
+        android:src="@drawable/epita"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

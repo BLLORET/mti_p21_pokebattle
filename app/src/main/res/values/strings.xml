@@ -23,6 +23,8 @@
     <string name="label_made_by">An application made by:</string>
     <string name="label_select_pokemon">Please select your Pokemons for the battle to come.</string>
 
+    <string name="picture_description_epita">Picture of the Epita logo.</string>
+
     <string name="stats_attack">Attack: </string>
     <string name="stats_defense">Defense: </string>
     <string name="stats_life">HP: </string>
@@ -31,4 +33,6 @@
     <string name="stats_speed">Speed: </string>
     <string name="stats_types">Types:</string>
     <string name="stats_weight">Weight: </string>
+
+
 </resources>
