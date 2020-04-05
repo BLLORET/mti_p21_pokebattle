@@ -1,3 +1,34 @@
 <resources>
-    <string name="app_name">PokeBattle</string>
+    <string name="app_name">PokeFight</string>
+    <string name="app_owner_antonin">Antonin Ginet</string>
+    <string name="app_owner_baptiste">Baptiste Lloret</string>
+    <string name="app_owner_nicolas">Nicolas Acart</string>
+    <string name="app_owner_oceane">Océane Merlo</string>
+
+    <string name="btn_1">1</string>
+    <string name="btn_2">2</string>
+    <string name="btn_3">3</string>
+    <string name="btn_battle">BATTLE</string>
+    <string name="btn_fight">FIGHT !</string>
+    <string name="btn_pokedex">POKEDEX</string>
+
+    <string name="label_default_pokemon_name">pokemon-name</string>
+    <string name="label_explanation">Welcome Trainer! You have a team of three pokemons and you will fight 3 wild pokemons in a row. But before the battle starts, you only know your first opponent. And remember, most Pokemons have strengths and weaknesses.
+        Good Luck!</string>
+    <string name="label_first_opponent">Your first opponent will be…</string>
+    <string name="label_pokebattle">PokeBattle</string>
+    <string name="label_pokedex">PokeDex</string>
+    <string name="label_no_pokemon">\?</string>
+    <string name="label_made_at">Made at</string>
+    <string name="label_made_by">An application made by:</string>
+    <string name="label_select_pokemon">Please select your Pokemons for the battle to come.</string>
+
+    <string name="stats_attack">Attack: </string>
+    <string name="stats_defense">Defense: </string>
+    <string name="stats_life">HP: </string>
+    <string name="stats_special_attack">Special Attack: </string>
+    <string name="stats_special_defense">Special Defense: </string>
+    <string name="stats_speed">Speed: </string>
+    <string name="stats_types">Types:</string>
+    <string name="stats_weight">Weight: </string>
 </resources>
