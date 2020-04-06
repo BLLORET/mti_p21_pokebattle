@@ -29,10 +29,13 @@ class MainActivity : AppCompatActivity(), SplashScreenFragment.SplashScreenButto
         )
         fragmentTransaction.commit()
 
-        getPokemonModels()
+        loadPokemonModels()
     }
 
-    private fun getPokemonModels() {
+    /**
+     * Load Pokemons on the internet and store it in [data]
+     */
+    private fun loadPokemonModels() {
         val baseURL = "http://www.surleweb.xyz/api/"
         val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
         val retrofit = Retrofit.Builder()

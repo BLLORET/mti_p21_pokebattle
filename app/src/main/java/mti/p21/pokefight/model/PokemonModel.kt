@@ -1,7 +1,8 @@
 package mti.p21.pokefight.model
 
-import java.io.Serializable
-
+/**
+ * Class that hold principal informations about a pokemon.
+ */
 data class PokemonModel (
     val id : Int,
     val name : String,

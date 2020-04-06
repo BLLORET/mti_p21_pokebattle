@@ -1,7 +1,8 @@
 package mti.p21.pokefight.model
 
-import java.io.Serializable
-
+/**
+ * Class that represent the pokemon type.
+ */
 data class PokeType (val name : String) {
 
     /**

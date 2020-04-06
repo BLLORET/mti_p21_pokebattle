@@ -18,7 +18,7 @@ import mti.p21.pokefight.model.PokemonModel
 import kotlin.reflect.typeOf
 
 /**
- * A simple [Fragment] subclass.
+ * [PokedexListFragment] represent the fragment of the pokedex list view.
  */
 class PokedexListFragment : Fragment() {
 

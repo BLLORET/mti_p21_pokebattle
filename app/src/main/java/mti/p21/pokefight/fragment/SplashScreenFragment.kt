@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.fragment_splash_screen.*
 import mti.p21.pokefight.R
 
 /**
- * A simple [Fragment] subclass.
+ * [SplashScreenFragment] represent the fragment of the splash screen view.
  */
 class SplashScreenFragment : Fragment() {
 
@@ -33,9 +33,19 @@ class SplashScreenFragment : Fragment() {
         }
     }
 
+    /**
+     * Interface that hold buttons redirection functions.
+     */
     interface SplashScreenButtonClicked {
 
+        /**
+         * Redirect to the Battle Lobby fragment.
+         */
         fun onBattleClicked()
+
+        /**
+         * Redirect to the pokedex list fragment.
+         */
         fun onPokedexClicked()
     }
 }

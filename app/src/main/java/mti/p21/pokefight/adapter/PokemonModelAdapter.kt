@@ -10,6 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import mti.p21.pokefight.R
 import mti.p21.pokefight.model.PokemonModel
 
+/**
+ * [PokemonModelAdapter] Represent the adapter that fill the wanted RecyclerView.
+ * @param data : The list of pokemon
+ * @param context : The context of the adapter
+ */
 class PokemonModelAdapter(private val data : List<PokemonModel>,
                           private val context : Context)
     : RecyclerView.Adapter<PokemonModelAdapter.ViewHolder>() {
@@ -20,6 +25,12 @@ class PokemonModelAdapter(private val data : List<PokemonModel>,
         val pokemonType2ImageView : ImageView = itemView.findViewById(R.id.item_type2_imageView)
     }
 
+    /**
+     * Called when the ViewHolder is created to create the RowView.
+     * @param parent : The ViewGroup on which attach the ViewHolder
+     * @param viewType :
+     * @return Returns the ViewHolder
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val rowView : View = LayoutInflater.from(context)
                             .inflate(R.layout.fragment_pokemon_item_list,
@@ -27,10 +38,19 @@ class PokemonModelAdapter(private val data : List<PokemonModel>,
         return ViewHolder(rowView)
     }
 
+    /**
+     * Get the number of items
+     * @return Returns the size of the list
+     */
     override fun getItemCount(): Int {
         return data.size
     }
 
+    /**
+     * Called to display items in the RecyclerView.
+     * @param holder : Represent the viewHolder
+     * @param position : The position of the item to display
+     */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.tag = position
         holder.pokemonNameTextView.text = data[position].name
