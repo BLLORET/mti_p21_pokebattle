@@ -1,4 +1,4 @@
-package mti.p21.pokebattle
+package mti.p21.pokefight
 
 import org.junit.Test
 
