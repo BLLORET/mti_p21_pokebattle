@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity(), SplashScreenFragment.SplashScreenButto
      * Load Pokemons on the internet and store it in [data]
      */
     private fun loadPokemonModels() {
-        val baseURL = "http://www.surleweb.xyz/api/"
+        val baseURL = "https://www.surleweb.xyz/api/"
         val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
         val retrofit = Retrofit.Builder()
             .baseUrl(baseURL)
@@ -55,9 +55,12 @@ class MainActivity : AppCompatActivity(), SplashScreenFragment.SplashScreenButto
                 call: Call<List<PokemonModel>>,
                 response: Response<List<PokemonModel>>
             ) {
+                Log.w("Pokemon", "WebService status: " + response.code())
                 if (response.code() == 200) {
                     response.body().let {
-                        data = it as List<PokemonModel>
+                        data = (it as List<PokemonModel>).sortedBy {pokemon ->
+                            pokemon.id
+                        }
                     }
                 }
             }

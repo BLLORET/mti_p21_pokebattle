@@ -37,14 +37,7 @@ class PokedexListFragment : Fragment() {
 
         pokemons = (activity as MainActivity).data
 
-        recycler_container.setHasFixedSize(true)
         recycler_container.layoutManager = LinearLayoutManager(activity)
         recycler_container.adapter = PokemonModelAdapter(pokemons, activity!!)
-        recycler_container.addItemDecoration(
-            DividerItemDecoration(
-                activity,
-                LinearLayoutManager.VERTICAL
-            )
-        )
     }
 }
