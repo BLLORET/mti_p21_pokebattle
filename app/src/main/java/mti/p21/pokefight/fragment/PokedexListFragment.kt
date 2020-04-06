@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.fragment_pokedex_list.*
+import mti.p21.pokefight.MainActivity
 
 import mti.p21.pokefight.R
 import mti.p21.pokefight.adapter.PokemonModelAdapter
@@ -33,14 +34,8 @@ class PokedexListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
-        arguments?.let {
-            val jsonContent = it!!.getString("Pokemons")
-            val jsonBuilder = GsonBuilder().create()
 
-            val type = object : TypeToken<List<PokemonModel>>() {}.type
-            pokemons = jsonBuilder.fromJson(jsonContent, type)
-        }
+        pokemons = (activity as MainActivity).data
 
         recycler_container.setHasFixedSize(true)
         recycler_container.layoutManager = LinearLayoutManager(activity)

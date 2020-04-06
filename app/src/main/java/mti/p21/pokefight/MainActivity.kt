@@ -13,7 +13,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.Serializable
 
 class MainActivity : AppCompatActivity(), SplashScreenFragment.SplashScreenButtonClicked {
 
@@ -68,21 +67,10 @@ class MainActivity : AppCompatActivity(), SplashScreenFragment.SplashScreenButto
     }
 
     override fun onPokedexClicked() {
-
-        val jsonBuilder = GsonBuilder().create()
-        val dataJson : String = jsonBuilder.toJson(data)
-
-        val argumentBundle = Bundle()
-
-        argumentBundle.putSerializable("Pokemons", dataJson)
-
-        val pokedexListFragment = PokedexListFragment()
-        pokedexListFragment.arguments = argumentBundle
-
         supportFragmentManager
             .beginTransaction()
             .addToBackStack(null)
-            .replace(R.id.main_container, pokedexListFragment)
+            .replace(R.id.main_container, PokedexListFragment())
             .commit()
     }
 }
