@@ -1,6 +1,7 @@
 package mti.p21.pokefight.adapter
 
 import android.content.Context
+import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +17,8 @@ import mti.p21.pokefight.model.PokemonModel
  * @param context : The context of the adapter
  */
 class PokemonModelAdapter(private val data : List<PokemonModel>,
-                          private val context : Context)
+                          private val context : Context,
+                          private  val resource : Resources)
     : RecyclerView.Adapter<PokemonModelAdapter.ViewHolder>() {
 
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
@@ -54,6 +56,6 @@ class PokemonModelAdapter(private val data : List<PokemonModel>,
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.tag = position
         holder.pokemonNameTextView.text = data[position].name
-        //holder.pokemonType1ImageView.setImageResource("@drawable/" + data[position].types[0].getPicture())
+        //holder.pokemonType1ImageView.setImageDrawable(data[position].types[0].getPicture(resource))
     }
 }
