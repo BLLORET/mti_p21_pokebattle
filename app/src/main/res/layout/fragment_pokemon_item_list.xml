@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/item_pokemon_name_textView"
         android:layout_width="wrap_content"
-        android:layout_height="15dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="@string/label_default_pokemon_name"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,8 +25,7 @@
         app:layout_constraintEnd_toStartOf="@+id/item_type2_imageView"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/item_pokemon_name_textView"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/electric" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/item_type2_imageView"
@@ -36,7 +35,6 @@
         android:contentDescription="@string/picture_description_type"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/electric" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

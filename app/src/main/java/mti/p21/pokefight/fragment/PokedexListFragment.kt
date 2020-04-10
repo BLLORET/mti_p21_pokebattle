@@ -36,7 +36,6 @@ class PokedexListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         pokemons = (activity as MainActivity).data
-
         recycler_container.layoutManager = LinearLayoutManager(activity)
         recycler_container.adapter = PokemonModelAdapter(pokemons, activity!!, resources)
     }

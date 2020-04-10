@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), SplashScreenFragment.SplashScreenButto
                 if (response.code() == 200) {
                     response.body().let {
                         data = (it as List<PokemonModel>).sortedBy {pokemon ->
-                            pokemon.id
+                            pokemon.name
                         }
                     }
                 }

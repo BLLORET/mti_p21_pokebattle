@@ -56,6 +56,9 @@ class PokemonModelAdapter(private val data : List<PokemonModel>,
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.tag = position
         holder.pokemonNameTextView.text = data[position].name
-        //holder.pokemonType1ImageView.setImageDrawable(data[position].types[0].getPicture(resource))
+        holder.pokemonType1ImageView.setImageResource(data[position].types[0].getPicture(resource, context))
+        if (data[position].types.size > 1) {
+            holder.pokemonType2ImageView.setImageResource((data[position].types[1].getPicture(resource, context)))
+        }
     }
 }
