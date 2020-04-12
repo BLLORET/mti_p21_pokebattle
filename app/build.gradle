@@ -7,7 +7,7 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "mti.p21.pokebattle"
+        applicationId "mti.p21.pokefight"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1

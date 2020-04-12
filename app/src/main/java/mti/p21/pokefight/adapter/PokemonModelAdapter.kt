@@ -5,6 +5,7 @@ import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +19,8 @@ import mti.p21.pokefight.model.PokemonModel
  */
 class PokemonModelAdapter(private val data : List<PokemonModel>,
                           private val context : Context,
-                          private  val resource : Resources)
+                          private  val resource : Resources,
+                          private  val onItemClickListener: View.OnClickListener)
     : RecyclerView.Adapter<PokemonModelAdapter.ViewHolder>() {
 
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
@@ -37,6 +39,8 @@ class PokemonModelAdapter(private val data : List<PokemonModel>,
         val rowView : View = LayoutInflater.from(context)
                             .inflate(R.layout.fragment_pokemon_item_list,
                                      parent, false)
+        rowView.setOnClickListener(onItemClickListener)
+
         return ViewHolder(rowView)
     }
 
@@ -56,9 +60,15 @@ class PokemonModelAdapter(private val data : List<PokemonModel>,
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.tag = position
         holder.pokemonNameTextView.text = data[position].name
-        holder.pokemonType1ImageView.setImageResource(data[position].types[0].getPicture(resource, context))
-        if (data[position].types.size > 1) {
-            holder.pokemonType2ImageView.setImageResource((data[position].types[1].getPicture(resource, context)))
-        }
+
+        holder.pokemonType1ImageView.setImageResource(
+            data[position].types[0].getPictureID(resource, context)
+        )
+        holder.pokemonType2ImageView.setImageResource(
+            if (data[position].types.size > 1)
+                data[position].types[1].getPictureID(resource, context)
+            else
+                0
+        )
     }
 }

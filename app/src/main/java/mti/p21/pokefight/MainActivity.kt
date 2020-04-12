@@ -3,7 +3,9 @@ package mti.p21.pokefight
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
 import com.google.gson.GsonBuilder
+import mti.p21.pokefight.fragment.LobbyFragment
 import mti.p21.pokefight.fragment.PokedexListFragment
 import mti.p21.pokefight.fragment.SplashScreenFragment
 import mti.p21.pokefight.model.PokemonModel
@@ -69,14 +71,18 @@ class MainActivity : AppCompatActivity(), SplashScreenFragment.SplashScreenButto
     }
 
     override fun onBattleClicked() {
-        TODO("Not yet implemented")
+        goToFragment(LobbyFragment())
     }
 
     override fun onPokedexClicked() {
+        goToFragment(PokedexListFragment())
+    }
+
+    private fun goToFragment(fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
             .addToBackStack(null)
-            .replace(R.id.main_container, PokedexListFragment())
+            .replace(R.id.main_container, fragment)
             .commit()
     }
 }
