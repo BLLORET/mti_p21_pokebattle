@@ -12,9 +12,9 @@ import mti.p21.pokefight.R
 data class PokeType (val name : String) {
 
     /**
-     * Return the string path picture associated with the specific PokeType.
+     * Return the id of the picture associated with the specific PokeType.
      */
-    fun getPicture(resources : Resources, context: Context): Int {
+    fun getPictureID(resources : Resources, context: Context): Int {
         return resources.getIdentifier(name, "drawable", context.packageName)
     }
 }

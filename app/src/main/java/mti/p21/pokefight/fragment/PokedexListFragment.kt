@@ -35,8 +35,12 @@ class PokedexListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val bidon = View.OnClickListener {
+
+        }
+
         pokemons = (activity as MainActivity).data
         recycler_container.layoutManager = LinearLayoutManager(activity)
-        recycler_container.adapter = PokemonModelAdapter(pokemons, activity!!, resources)
+        recycler_container.adapter = PokemonModelAdapter(pokemons, activity!!, resources, bidon)
     }
 }
