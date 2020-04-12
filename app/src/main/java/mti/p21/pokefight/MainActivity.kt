@@ -22,20 +22,19 @@ class MainActivity : AppCompatActivity(),
                      SplashScreenFragment.SplashScreenButtonClicked,
                      LobbyFragment.LobbyTypeClicked {
 
-    var data : List<PokemonModel> = arrayListOf()
+    lateinit var data : List<PokemonModel>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
-
-        fragmentTransaction.replace(R.id.main_container,
-            SplashScreenFragment()
-        )
-        fragmentTransaction.commit()
 
         loadPokemonModels()
+
+        setContentView(R.layout.activity_main)
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.main_container, SplashScreenFragment())
+            .commit()
     }
 
     /**
@@ -61,7 +60,6 @@ class MainActivity : AppCompatActivity(),
                 call: Call<List<PokemonModel>>,
                 response: Response<List<PokemonModel>>
             ) {
-                Log.w("Pokemon", "WebService status: " + response.code())
                 if (response.code() == 200) {
                     response.body().let {
                         data = (it as List<PokemonModel>).sortedBy {pokemon ->
