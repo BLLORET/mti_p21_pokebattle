@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import com.google.gson.GsonBuilder
+import mti.p21.pokefight.fragment.HelpScreenFragment
 import mti.p21.pokefight.fragment.LobbyFragment
 import mti.p21.pokefight.fragment.PokedexListFragment
 import mti.p21.pokefight.fragment.SplashScreenFragment
+import mti.p21.pokefight.model.PokeType
 import mti.p21.pokefight.model.PokemonModel
 import mti.p21.pokefight.webServiceInterface.PokemonModelInterface
 import retrofit2.Call
@@ -16,7 +18,9 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class MainActivity : AppCompatActivity(), SplashScreenFragment.SplashScreenButtonClicked {
+class MainActivity : AppCompatActivity(),
+                     SplashScreenFragment.SplashScreenButtonClicked,
+                     LobbyFragment.LobbyTypeClicked {
 
     var data : List<PokemonModel> = arrayListOf()
 
@@ -83,6 +87,21 @@ class MainActivity : AppCompatActivity(), SplashScreenFragment.SplashScreenButto
             .beginTransaction()
             .addToBackStack(null)
             .replace(R.id.main_container, fragment)
+            .commit()
+    }
+
+    override fun onTypeClicked(pokeType : PokeType) {
+
+        val argumentsBundle = Bundle()
+        argumentsBundle.putSerializable("PokeType", pokeType)
+
+        val helpScreenFragment = HelpScreenFragment()
+        helpScreenFragment.arguments = argumentsBundle
+
+        supportFragmentManager
+            .beginTransaction()
+            .addToBackStack(null)
+            .add(R.id.main_container, helpScreenFragment)
             .commit()
     }
 }

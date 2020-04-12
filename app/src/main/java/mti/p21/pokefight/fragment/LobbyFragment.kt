@@ -15,6 +15,7 @@ import mti.p21.pokefight.MainActivity
 
 import mti.p21.pokefight.R
 import mti.p21.pokefight.adapter.PokemonModelAdapter
+import mti.p21.pokefight.model.PokeType
 import mti.p21.pokefight.model.PokemonModel
 
 /**
@@ -43,11 +44,13 @@ class LobbyFragment : Fragment() {
             pokemon.types.map { type -> type.name }.reduce { acc, pokeType -> acc + pokeType}
         }
 
+        // Opponent zone
         pokemonsOpponents = getOpponents()
         setFirstOpponentInformations(pokemonsOpponents[0])
+        setFirstOpponentsListeners()
 
+        // RecyclerView zone
         val onPokemonLineClickListener = createPokemonLineClickListener()
-
         recyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerView.adapter = PokemonModelAdapter(pokemons, activity!!, resources,
                                                    onPokemonLineClickListener)
@@ -58,6 +61,14 @@ class LobbyFragment : Fragment() {
             )
         )
 
+        // Choose Pokemons Team zone
+        setChoosePokemonsTeamListeners()
+    }
+
+    /**
+     * Set listeners about the pokemon team zone.
+     */
+    private fun setChoosePokemonsTeamListeners() {
         btn_choosePokemon1.setOnClickListener {
             setPokemonTeam(0, chosenPokemon1_imageView, chosenPokemon1_name_textView)
         }
@@ -68,6 +79,24 @@ class LobbyFragment : Fragment() {
 
         btn_choosePokemon3.setOnClickListener {
             setPokemonTeam(2, chosenPokemon3_imageView, chosenPokemon3_name_textView)
+        }
+    }
+
+    /**
+     * Set listeners on the first opponent to see help associated.
+     */
+    private fun setFirstOpponentsListeners() {
+        val firstOpponentTypes : List<PokeType> = pokemonsOpponents[0].types
+
+        firstOpponent_type1_imageView.setOnClickListener {
+            (activity as MainActivity).onTypeClicked(firstOpponentTypes[0])
+        }
+
+        if (firstOpponentTypes.size > 1)
+        {
+            firstOpponent_type2_imageView.setOnClickListener {
+                (activity as MainActivity).onTypeClicked(firstOpponentTypes[1])
+            }
         }
     }
 
@@ -124,6 +153,9 @@ class LobbyFragment : Fragment() {
         )
     }
 
+    /**
+     * Create a listener on line in the recycler view to set the selected pokemon.
+     */
     private fun createPokemonLineClickListener() : View.OnClickListener {
         return View.OnClickListener { clickedView ->
             selectedPokemon = pokemons[clickedView.tag as Int]
@@ -143,8 +175,18 @@ class LobbyFragment : Fragment() {
         }
     }
 
+    /**
+     * Activate the button fight if the team is complete
+     */
     private fun activateButtonFight() {
-        if (!team.contains(null))
+        if (!team.contains(null) && btn_fight.visibility != View.VISIBLE)
             btn_fight.visibility = View.VISIBLE
+    }
+
+    interface LobbyTypeClicked {
+        /**
+         * Open an help fragment.
+         */
+        fun onTypeClicked(pokeType: PokeType)
     }
 }

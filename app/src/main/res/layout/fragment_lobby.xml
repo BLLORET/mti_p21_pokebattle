@@ -131,7 +131,7 @@
         android:id="@+id/leftVerticalDivider"
         android:layout_width="1dp"
         android:layout_height="200dp"
-        android:background="#9C9C9C"
+        android:background="@color/dividerColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/rightVerticalDivider"
         app:layout_constraintStart_toStartOf="parent" />
@@ -141,7 +141,7 @@
         android:layout_width="1dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:background="#9C9C9C"
+        android:background="@color/dividerColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/leftVerticalDivider"
