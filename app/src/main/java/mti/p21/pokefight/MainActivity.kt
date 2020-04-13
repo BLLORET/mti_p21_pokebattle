@@ -103,8 +103,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onFightClicked(team: List<PokemonModel>, opponentTeam: List<PokemonModel>) {
-        val argumentBundle = Bundle()
-
-        goToFragment(BattleFragment())
+        goToFragment(BattleFragment(team, opponentTeam))
     }
 }
