@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-import mti.p21.pokebattle.R
 import mti.p21.pokefight.R
 
 /**
