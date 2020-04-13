@@ -48,7 +48,7 @@ class HelpScreenFragment : Fragment() {
     }
 
     /**
-     * Load damage relations of a specific type in pokeApi and store it
+     * Load damage relations of a specific type in pokeApi and store it in [damageRelations]
      */
     private fun loadDamageRelations(name : String) {
         val baseURL = "https://pokeapi.co/api/v2/"
@@ -70,6 +70,7 @@ class HelpScreenFragment : Fragment() {
                 if (response.code() == 200) {
                     response.body().let {
                         damageRelations = it!!.damage_relations
+                        Log.w("it", it.toString())
                     }
                 }
             }

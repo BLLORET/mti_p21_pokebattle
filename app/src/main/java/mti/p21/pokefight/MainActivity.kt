@@ -5,10 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import com.google.gson.GsonBuilder
-import mti.p21.pokefight.fragment.HelpScreenFragment
-import mti.p21.pokefight.fragment.LobbyFragment
-import mti.p21.pokefight.fragment.PokedexListFragment
-import mti.p21.pokefight.fragment.SplashScreenFragment
+import mti.p21.pokefight.fragment.*
 import mti.p21.pokefight.model.PokeType
 import mti.p21.pokefight.model.PokemonModel
 import mti.p21.pokefight.webServiceInterface.PokemonModelInterface
@@ -20,7 +17,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity(),
                      SplashScreenFragment.SplashScreenButtonClicked,
-                     LobbyFragment.LobbyTypeClicked {
+                     LobbyFragment.LobbyTypeClicked,
+                     LobbyFragment.FightClicked {
 
     lateinit var data : List<PokemonModel>
 
@@ -96,10 +94,17 @@ class MainActivity : AppCompatActivity(),
         val helpScreenFragment = HelpScreenFragment()
         helpScreenFragment.arguments = argumentsBundle
 
+        // Do not use goToFragment because it does not replace the fragment
         supportFragmentManager
             .beginTransaction()
             .addToBackStack(null)
             .add(R.id.main_container, helpScreenFragment)
             .commit()
+    }
+
+    override fun onFightClicked(team: List<PokemonModel>, opponentTeam: List<PokemonModel>) {
+        val argumentBundle = Bundle()
+
+        goToFragment(BattleFragment())
     }
 }
