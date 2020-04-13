@@ -44,6 +44,10 @@ class LobbyFragment : Fragment() {
             pokemon.types.map { type -> type.name }.reduce { acc, pokeType -> acc + pokeType}
         }
 
+        btn_fight.setOnClickListener {
+            (activity as MainActivity).onFightClicked(team as List<PokemonModel>, pokemonsOpponents)
+        }
+
         // Opponent zone
         pokemonsOpponents = getOpponents()
         setFirstOpponentInformations(pokemonsOpponents[0])
@@ -188,5 +192,12 @@ class LobbyFragment : Fragment() {
          * Open an help fragment.
          */
         fun onTypeClicked(pokeType: PokeType)
+    }
+
+    interface FightClicked {
+        /**
+         * Open the battle fragment.
+         */
+        fun onFightClicked(team : List<PokemonModel>, opponentTeam: List<PokemonModel>)
     }
 }
