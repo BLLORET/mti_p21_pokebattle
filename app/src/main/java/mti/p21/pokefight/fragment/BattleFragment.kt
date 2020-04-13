@@ -7,11 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 
 import mti.p21.pokefight.R
+import mti.p21.pokefight.model.PokemonModel
 
 /**
  * A simple [Fragment] subclass.
  */
-class BattleFragment : Fragment() {
+class BattleFragment(val team : List<PokemonModel>,
+                     val opponentTeam : List<PokemonModel>) : Fragment()
+
+{
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -21,4 +25,8 @@ class BattleFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_battle, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+    }
 }
