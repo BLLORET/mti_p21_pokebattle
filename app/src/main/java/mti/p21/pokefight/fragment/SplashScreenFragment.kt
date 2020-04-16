@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_splash_screen.*
+import mti.p21.pokefight.MainActivity
 import mti.p21.pokefight.R
 
 /**
@@ -23,6 +24,11 @@ class SplashScreenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if ((activity as MainActivity).data == null) {
+            btn_battle.isEnabled = false
+            btn_pokedex.isEnabled = false
+        }
 
         btn_battle.setOnClickListener {
             (activity as SplashScreenButtonClicked).onBattleClicked()

@@ -4,12 +4,12 @@ import mti.p21.pokefight.model.PokemonDetailsModel
 import mti.p21.pokefight.model.TypeModel
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.Path
 
 interface PokeApiInterface {
-    @GET("type")
-    fun getDamageRelations(@Query("name") name : String) : Call<TypeModel>
+    @GET("type/{name}")
+    fun getDamageRelations(@Path("name") name : String) : Call<TypeModel>
 
-    @GET("pokemon")
-    fun getPokemonDetails(@Query("name") name : String) : Call<PokemonDetailsModel>
+    @GET("pokemon/{name}")
+    fun getPokemonDetails(@Path("name") name : String) : Call<PokemonDetailsModel>
 }

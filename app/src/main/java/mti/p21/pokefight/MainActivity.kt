@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import com.google.gson.GsonBuilder
+import kotlinx.android.synthetic.main.fragment_splash_screen.*
 import mti.p21.pokefight.fragment.*
 import mti.p21.pokefight.model.PokeType
 import mti.p21.pokefight.model.PokemonModel
@@ -20,12 +21,10 @@ class MainActivity : AppCompatActivity(),
                      LobbyFragment.LobbyTypeClicked,
                      LobbyFragment.FightClicked {
 
-    lateinit var data : List<PokemonModel>
+    var data : List<PokemonModel>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        loadPokemonModels()
 
         setContentView(R.layout.activity_main)
 
@@ -33,6 +32,8 @@ class MainActivity : AppCompatActivity(),
             .beginTransaction()
             .replace(R.id.main_container, SplashScreenFragment())
             .commit()
+
+        loadPokemonModels()
     }
 
     /**
@@ -59,10 +60,12 @@ class MainActivity : AppCompatActivity(),
                 response: Response<List<PokemonModel>>
             ) {
                 if (response.code() == 200) {
-                    response.body().let {
-                        data = (it as List<PokemonModel>).sortedBy {pokemon ->
+                    response.body()?.let { pokemonModels ->
+                        data = pokemonModels.sortedBy {pokemon ->
                             pokemon.name
                         }
+                        btn_battle.isEnabled = true
+                        btn_pokedex.isEnabled = true
                     }
                 }
             }

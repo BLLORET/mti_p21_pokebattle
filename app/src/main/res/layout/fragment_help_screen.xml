@@ -14,13 +14,11 @@
         android:contentDescription="@string/picture_description_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/help_type_imageView"
+        android:id="@+id/helpType_imageView"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginTop="16dp"
@@ -69,7 +67,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/multiplier05_textView"
-        app:layout_constraintTop_toBottomOf="@+id/help_type_imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/helpType_imageView" />
 
     <TextView
         android:id="@+id/from_textView"
@@ -117,5 +115,71 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/centralHorizontalDivider" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/doubleDamageFrom_recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/centralHorizontalDivider"
+        app:layout_constraintEnd_toStartOf="@+id/centralVerticalDivider"
+        app:layout_constraintStart_toEndOf="@+id/multiplier05_textView"
+        app:layout_constraintTop_toBottomOf="@+id/topHorizontalDivider" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/doubleDamageTo_recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/doubleDamageFrom_recyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/centralVerticalDivider"
+        app:layout_constraintTop_toTopOf="@+id/doubleDamageFrom_recyclerView" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/halfDamageFrom_recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomHorizontalDivider"
+        app:layout_constraintEnd_toEndOf="@+id/doubleDamageFrom_recyclerView"
+        app:layout_constraintStart_toStartOf="@+id/doubleDamageFrom_recyclerView"
+        app:layout_constraintTop_toBottomOf="@+id/centralHorizontalDivider" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/halfDamageTo_recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/halfDamageFrom_recyclerView"
+        app:layout_constraintEnd_toEndOf="@+id/doubleDamageTo_recyclerView"
+        app:layout_constraintStart_toStartOf="@+id/doubleDamageTo_recyclerView"
+        app:layout_constraintTop_toTopOf="@+id/halfDamageFrom_recyclerView"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/noDamageFrom_recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/halfDamageFrom_recyclerView"
+        app:layout_constraintStart_toStartOf="@+id/halfDamageFrom_recyclerView"
+        app:layout_constraintTop_toBottomOf="@+id/bottomHorizontalDivider" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/noDamageTo_recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/noDamageFrom_recyclerView"
+        app:layout_constraintEnd_toEndOf="@+id/halfDamageTo_recyclerView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/halfDamageTo_recyclerView"
+        app:layout_constraintTop_toTopOf="@+id/noDamageFrom_recyclerView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
