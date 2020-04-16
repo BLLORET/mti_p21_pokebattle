@@ -39,21 +39,21 @@ class PokedexDetailsFragment : Fragment() {
         (super.onViewCreated(view, savedInstanceState))
         arguments?.let{
             val pokemon = it.getSerializable("PokemonModel") as PokemonModel
-         //   getPokeStats(pokemon.name)
+            getPokeStats(pokemon.name)
             Glide
                 .with(activity!!)
                 .load(pokemon!!.sprite)
                 .into(details_pokemon_ImageView_Pokemon)
-            Glide
-                .with(activity!!)
-                .load(pokemon!!.types[0])
-                .into(details_pokemon_ImageView_Type1)
-            if (pokemon!!.types.size > 1) {
-                Glide
-                    .with(activity!!)
-                    .load(pokemon!!.types[1])
-                    .into(details_pokemon_ImageView_Type2)
-            }
+            details_pokemon_ImageView_Type1.setImageResource(
+                pokemon!!.types[0].getPictureID(resources, activity!!)
+            )
+            details_pokemon_ImageView_Type2.setImageResource(
+                if(pokemon!!.types.size > 1) {
+                    pokemon!!.types[1].getPictureID(resources, activity!!)
+                } else {
+                    0
+                }
+            )
             details_pokemon_TextView_Name.text = pokemon.name
         }
     }
