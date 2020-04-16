@@ -22,7 +22,7 @@ import kotlin.reflect.typeOf
  */
 class PokedexListFragment : Fragment() {
 
-    var pokemons : List<PokemonModel> = arrayListOf()
+    lateinit var pokemons : List<PokemonModel>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,7 +39,7 @@ class PokedexListFragment : Fragment() {
 
         }
 
-        pokemons = (activity as MainActivity).data
+        pokemons = (activity as MainActivity).data!!
         recycler_container.layoutManager = LinearLayoutManager(activity)
         recycler_container.adapter = PokemonModelAdapter(pokemons, activity!!, resources, bidon)
     }

@@ -40,7 +40,7 @@ class LobbyFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Get the list au pokemon sorted by type1 then type2 if it exists
-        pokemons = (activity as MainActivity).data.sortedBy {pokemon ->
+        pokemons = (activity as MainActivity).data!!.sortedBy {pokemon ->
             pokemon.types.map { type -> type.name }.reduce { acc, pokeType -> acc + pokeType}
         }
 
