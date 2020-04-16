@@ -41,9 +41,9 @@
     <string name="stats_speed">Speed: </string>
     <string name="stats_types">Types:</string>
     <string name="stats_weight">Weight: </string>
+    <string name="stats_height">Height:</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
 
 </resources>

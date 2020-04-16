@@ -18,7 +18,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainActivity : AppCompatActivity(),
                      SplashScreenFragment.SplashScreenButtonClicked,
                      LobbyFragment.LobbyTypeClicked,
-                     LobbyFragment.FightClicked {
+                     LobbyFragment.FightClicked,
+                     PokedexListFragment.PokedexDetailsFragmentClicked {
 
     lateinit var data : List<PokemonModel>
 
@@ -106,5 +107,15 @@ class MainActivity : AppCompatActivity(),
         val argumentBundle = Bundle()
 
         goToFragment(BattleFragment())
+    }
+
+    override fun onDetailsClicked(pokemon: PokemonModel) {
+        val argumentsBundle = Bundle()
+        argumentsBundle.putSerializable("PokemonModel", pokemon)
+
+        val detailsPokemonFragment = PokedexDetailsFragment()
+        detailsPokemonFragment.arguments = argumentsBundle
+
+        goToFragment(detailsPokemonFragment)
     }
 }
