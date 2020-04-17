@@ -68,10 +68,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
+        android:text="@string/stats_height"
         android:textColor="#000000"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/details_pokemon_ImageView_Pokemon"
-        tools:text="@string/stats_height" />
+        app:layout_constraintTop_toBottomOf="@+id/details_pokemon_ImageView_Pokemon" />
 
     <TextView
         android:id="@+id/details_pokemon_TextView_Height_Param"
@@ -92,14 +92,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:text="@string/stats_speed"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/details_pokemon_TextView_Height"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="@string/stats_speed" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/details_pokemon_TextView_Speed_Param"
@@ -133,14 +133,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:text="@string/stats_attack"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/details_pokemon_TextView_Speed"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="@string/stats_attack" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/details_pokemon_TextView_SpeAttack"
@@ -148,14 +148,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:text="@string/stats_special_attack"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/details_pokemon_TextView_Attack"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="@string/stats_special_attack" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/details_pokemon_TextView_SpeAttack_Param"
@@ -176,14 +176,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="64dp"
+        android:text="@string/stats_weight"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.01"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/details_pokemon_TextView_Name"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="@string/stats_weight" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/details_pokemon_TextView_Weight_Param"
@@ -211,14 +211,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:text="@string/stats_life"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/details_pokemon_TextView_Weight"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="@string/stats_life" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/details_pokemon_TextView_HP_Param"
@@ -239,14 +239,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:text="@string/stats_defense"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/details_pokemon_TextView_HP"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="@string/stats_defense" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/details_pokemon_TextView_SpeDefense_Param"
@@ -280,14 +280,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:text="@string/stats_special_defense"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/details_pokemon_TextView_Defense"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="@string/stats_special_defense" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/details_pokemon_TextView_Types"
@@ -295,13 +295,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:text="@string/stats_types"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/details_pokemon_TextView_SpeAttack"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="@string/stats_types" />
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder
 import mti.p21.pokefight.fragment.*
 import mti.p21.pokefight.model.PokeType
 import mti.p21.pokefight.model.PokemonModel
+import mti.p21.pokefight.model.SimplifiedPokemonDetails
 import mti.p21.pokefight.webServiceInterface.PokemonModelInterface
 import retrofit2.Call
 import retrofit2.Callback
@@ -111,7 +112,9 @@ class MainActivity : AppCompatActivity(),
 
     override fun onDetailsClicked(pokemon: PokemonModel) {
         val argumentsBundle = Bundle()
-        argumentsBundle.putSerializable("PokemonModel", pokemon)
+        val simplifiedPokemon = SimplifiedPokemonDetails(pokemon.name, pokemon.sprite, pokemon.types)
+        while (simplifiedPokemon.weight == 0) continue
+        argumentsBundle.putSerializable("SimplifiedPokemon", simplifiedPokemon)
 
         val detailsPokemonFragment = PokedexDetailsFragment()
         detailsPokemonFragment.arguments = argumentsBundle

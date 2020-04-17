@@ -8,10 +8,13 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.Serializable
 
 data class SimplifiedPokemonDetails(
-    val name: String
-) {
+    val name: String,
+    val sprite: String,
+    val types: List<PokeType>
+) : Serializable {
     var height : Int = 0
     var weight : Int = 0
     var defense: Int = 0
