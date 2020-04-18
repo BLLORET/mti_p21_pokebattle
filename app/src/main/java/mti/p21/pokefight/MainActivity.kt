@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity(),
     override fun onDetailsClicked(pokemon: PokemonModel) {
         val argumentsBundle = Bundle()
         val simplifiedPokemon = SimplifiedPokemonDetails(pokemon.name, pokemon.sprite, pokemon.types)
-        while (simplifiedPokemon.weight == 0) continue
+
         argumentsBundle.putSerializable("SimplifiedPokemon", simplifiedPokemon)
 
         val detailsPokemonFragment = PokedexDetailsFragment()

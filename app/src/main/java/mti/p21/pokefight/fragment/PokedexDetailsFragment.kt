@@ -37,30 +37,40 @@ class PokedexDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (super.onViewCreated(view, savedInstanceState))
-        arguments?.let{
+        arguments?.let {
             val pokemon = it.getSerializable("SimplifiedPokemon") as SimplifiedPokemonDetails
-            Glide
-                .with(activity!!)
-                .load(pokemon!!.sprite)
-                .into(details_pokemon_ImageView_Pokemon)
-            details_pokemon_ImageView_Type1.setImageResource(
-                pokemon!!.types[0].getPictureID(resources, activity!!)
-            )
-            details_pokemon_ImageView_Type2.setImageResource(
-                if(pokemon!!.types.size > 1) {
-                    pokemon!!.types[1].getPictureID(resources, activity!!)
-                } else {
-                    0
-                }
-            )
+            loadPokemonDetails(pokemon)
+        }
+    }
+
+    private fun loadPokemonDetails(pokemon : SimplifiedPokemonDetails) {
+        pokemon.loadDetails {
             details_pokemon_TextView_Name.text = pokemon.name
             details_pokemon_TextView_Attack_Param.text = pokemon.attack.toString()
             details_pokemon_TextView_Defense_Param.text = pokemon.defense.toString()
             details_pokemon_TextView_HP_Param.text = pokemon.hp.toString()
+            details_pokemon_TextView_Speed_Param.text = pokemon.speed.toString()
             details_pokemon_TextView_Height_Param.text = pokemon.height.toString()
             details_pokemon_TextView_Weight_Param.text = pokemon.weight.toString()
             details_pokemon_TextView_SpeAttack_Param.text = pokemon.attackSpe.toString()
             details_pokemon_TextView_SpeDefense_Param.text = pokemon.defenseSpe.toString()
         }
+
+        // Load pictures
+        Glide
+            .with(activity!!)
+            .load(pokemon.sprite)
+            .into(details_pokemon_ImageView_Pokemon)
+
+        details_pokemon_ImageView_Type1.setImageResource(
+            pokemon.types[0].getPictureID(resources, activity!!)
+        )
+        details_pokemon_ImageView_Type2.setImageResource(
+            if (pokemon.types.size > 1) {
+                pokemon.types[1].getPictureID(resources, activity!!)
+            } else {
+                0
+            }
+        )
     }
 }

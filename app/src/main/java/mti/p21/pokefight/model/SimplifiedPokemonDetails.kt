@@ -24,7 +24,10 @@ data class SimplifiedPokemonDetails(
     var attackSpe: Int = 0
     var defenseSpe: Int = 0
 
-    init {
+    /**
+     * Load details in the API, apply the given function if it exist and and store details
+     */
+    fun loadDetails(function : () -> Unit) {
         val baseURL = "https://pokeapi.co/api/v2/"
         val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
         val retrofit = Retrofit.Builder()
@@ -53,10 +56,14 @@ data class SimplifiedPokemonDetails(
                         defenseSpe = stats.find{ st -> st.stat.name == "special-defense"}!!.base_stat
                         defense = stats.find{ st -> st.stat.name == "defense"}!!.base_stat
                         hp = stats.find{ st -> st.stat.name == "hp"}!!.base_stat
+
+                        function()
                     }
                 }
             }
         }
         service.getPokemonDetails(name).enqueue(wsServiceCallback)
+
+
     }
 }
