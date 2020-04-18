@@ -1,14 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.BattleFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/currentPokemonName_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_default_pokemon_name"
+        app:layout_constraintBottom_toTopOf="@+id/currentPokemon_imageView"
+        app:layout_constraintEnd_toEndOf="@+id/currentPokemon_imageView"
+        app:layout_constraintStart_toStartOf="@+id/currentPokemon_imageView" />
+
+    <TextView
+        android:id="@+id/opponentPokemonName_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_default_pokemon_name"
+        app:layout_constraintEnd_toEndOf="@+id/opponentPokemon_imageView"
+        app:layout_constraintStart_toStartOf="@+id/opponentPokemon_imageView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/vs_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_vs"
+        app:layout_constraintBottom_toBottomOf="@+id/currentPokemon_imageView"
+        app:layout_constraintEnd_toStartOf="@id/opponentPokemon_imageView"
+        app:layout_constraintStart_toEndOf="@id/currentPokemon_imageView"
+        app:layout_constraintTop_toTopOf="@+id/opponentPokemon_imageView" />
+
+    <ImageView
+        android:id="@+id/currentPokemon_imageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:contentDescription="@string/picture_description_pokemon"
+        app:layout_constraintEnd_toStartOf="@+id/vs_textView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/opponentPokemon_imageView"
+        tools:src="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/opponentPokemon_imageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:contentDescription="@string/picture_description_pokemon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/vs_textView"
+        app:layout_constraintTop_toBottomOf="@+id/opponentPokemonName_textView"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/labelHPcurrentPokemon_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/stats_life"
+        app:layout_constraintEnd_toEndOf="@+id/currentPokemon_imageView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/currentPokemon_imageView"
+        app:layout_constraintTop_toBottomOf="@+id/currentPokemon_imageView" />
+
+    <TextView
+        android:id="@+id/currentPokemonHP_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/labelHPcurrentPokemon_textView"
+        app:layout_constraintStart_toEndOf="@+id/labelHPcurrentPokemon_textView"
+        app:layout_constraintTop_toTopOf="@+id/labelHPcurrentPokemon_textView" />
+
+    <TextView
+        android:id="@+id/labelHPopponentPokemon_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/stats_life"
+        app:layout_constraintEnd_toEndOf="@+id/opponentPokemon_imageView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/opponentPokemon_imageView"
+        app:layout_constraintTop_toBottomOf="@+id/opponentPokemon_imageView" />
+
+    <TextView
+        android:id="@+id/opponentPokementHP_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/labelHPopponentPokemon_textView"
+        app:layout_constraintStart_toEndOf="@+id/labelHPopponentPokemon_textView"
+        app:layout_constraintTop_toTopOf="@+id/labelHPopponentPokemon_textView" />
+
+    <View
+        android:id="@+id/information_divider"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="36dp"
+        android:background="#B2DFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/labelHPcurrentPokemon_textView" />
+
+    <TextView
+        android:id="@+id/informations_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/interaction_select_action"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@+id/information_divider"
+        app:layout_constraintEnd_toEndOf="@+id/information_divider"
+        app:layout_constraintStart_toStartOf="@+id/information_divider"
+        app:layout_constraintTop_toTopOf="@+id/information_divider" />
+
+    <FrameLayout
+        android:id="@+id/interaction_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/information_divider">
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

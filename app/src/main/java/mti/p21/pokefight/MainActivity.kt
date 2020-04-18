@@ -19,7 +19,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainActivity : AppCompatActivity(),
                      SplashScreenFragment.SplashScreenButtonClicked,
                      LobbyFragment.LobbyTypeClicked,
-                     LobbyFragment.FightClicked {
+                     LobbyFragment.FightClicked,
+                     BattleFragment.TurnSelection {
 
     var data : List<PokemonModel>? = null
 
@@ -48,7 +49,6 @@ class MainActivity : AppCompatActivity(),
             .build()
 
         val service : PokemonModelInterface = retrofit.create(PokemonModelInterface::class.java)
-
 
         val wsServiceCallback : Callback<List<PokemonModel>> = object : Callback<List<PokemonModel>> {
             override fun onFailure(call: Call<List<PokemonModel>>, t: Throwable) {
@@ -102,6 +102,13 @@ class MainActivity : AppCompatActivity(),
             .beginTransaction()
             .addToBackStack(null)
             .add(R.id.main_container, helpScreenFragment)
+            .commit()
+    }
+
+    override fun chooseAction() {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.interaction_container, BattleInteractionFragment())
             .commit()
     }
 
