@@ -20,7 +20,8 @@ class MainActivity : AppCompatActivity(),
                      SplashScreenFragment.SplashScreenButtonClicked,
                      LobbyFragment.LobbyTypeClicked,
                      LobbyFragment.FightClicked,
-                     BattleFragment.TurnSelection {
+                     BattleFragment.TurnSelection,
+                     PokedexListFragment.PokedexDetailsFragmentClicked {
 
     var data : List<PokemonModel>? = null
 
@@ -114,5 +115,15 @@ class MainActivity : AppCompatActivity(),
 
     override fun onFightClicked(team: List<PokemonModel>, opponentTeam: List<PokemonModel>) {
         goToFragment(BattleFragment(team, opponentTeam))
+    }
+
+    override fun onDetailsClicked(pokemon: PokemonModel) {
+        val argumentsBundle = Bundle()
+        argumentsBundle.putSerializable("PokemonModel", pokemon)
+
+        val detailsPokemonFragment = PokedexDetailsFragment()
+        detailsPokemonFragment.arguments = argumentsBundle
+
+        goToFragment(detailsPokemonFragment)
     }
 }

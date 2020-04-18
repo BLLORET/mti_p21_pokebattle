@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import kotlinx.android.synthetic.main.fragment_pokedex_details.*
 import kotlinx.android.synthetic.main.fragment_pokedex_list.*
 import mti.p21.pokefight.MainActivity
 
@@ -35,12 +36,17 @@ class PokedexListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val bidon = View.OnClickListener {
-
+        val details = View.OnClickListener {
+            val pokemon = pokemons[it.tag as Int] as PokemonModel
+            (activity as PokedexDetailsFragmentClicked).onDetailsClicked(pokemon)
         }
 
         pokemons = (activity as MainActivity).data!!
         recycler_container.layoutManager = LinearLayoutManager(activity)
-        recycler_container.adapter = PokemonModelAdapter(pokemons, activity!!, resources, bidon)
+        recycler_container.adapter = PokemonModelAdapter(pokemons, activity!!, resources, details)
+    }
+
+    interface PokedexDetailsFragmentClicked {
+        fun onDetailsClicked(pokemon: PokemonModel)
     }
 }
