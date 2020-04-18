@@ -38,8 +38,7 @@ class PokedexDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (super.onViewCreated(view, savedInstanceState))
         arguments?.let{
-            val pokemon = it.getSerializable("PokemonModel") as PokemonModel
-            getPokeStats(pokemon.name)
+            val pokemon = it.getSerializable("SimplifiedPokemon") as SimplifiedPokemonDetails
             Glide
                 .with(activity!!)
                 .load(pokemon!!.sprite)
@@ -55,17 +54,13 @@ class PokedexDetailsFragment : Fragment() {
                 }
             )
             details_pokemon_TextView_Name.text = pokemon.name
+            details_pokemon_TextView_Attack_Param.text = pokemon.attack.toString()
+            details_pokemon_TextView_Defense_Param.text = pokemon.defense.toString()
+            details_pokemon_TextView_HP_Param.text = pokemon.hp.toString()
+            details_pokemon_TextView_Height_Param.text = pokemon.height.toString()
+            details_pokemon_TextView_Weight_Param.text = pokemon.weight.toString()
+            details_pokemon_TextView_SpeAttack_Param.text = pokemon.attackSpe.toString()
+            details_pokemon_TextView_SpeDefense_Param.text = pokemon.defenseSpe.toString()
         }
-    }
-
-    private fun getPokeStats(pokemonName: String) {
-        val details = SimplifiedPokemonDetails(pokemonName)
-        details_pokemon_TextView_Attack_Param.text = details.attack.toString()
-        details_pokemon_TextView_Defense_Param.text = details.defense.toString()
-        details_pokemon_TextView_HP_Param.text = details.hp.toString()
-        details_pokemon_TextView_Height_Param.text = details.height.toString()
-        details_pokemon_TextView_Weight_Param.text = details.weight.toString()
-        details_pokemon_TextView_SpeAttack_Param.text = details.attackSpe.toString()
-        details_pokemon_TextView_SpeDefense_Param.text = details.defenseSpe.toString()
     }
 }
