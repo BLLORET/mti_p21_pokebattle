@@ -7,21 +7,23 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_battle.*
+import kotlinx.android.synthetic.main.fragment_battle_interaction.*
 import mti.p21.pokefight.MainActivity
 
 import mti.p21.pokefight.R
 import mti.p21.pokefight.model.PokemonModel
+import mti.p21.pokefight.model.SimplifiedPokemonDetails
 
 /**
  * A simple [Fragment] subclass.
  */
 
-class BattleFragment(private val team : List<PokemonModel>,
-                     private val opponentTeam : List<PokemonModel>) : Fragment()
+class BattleFragment(private val team : List<SimplifiedPokemonDetails>,
+                     private val opponentTeam : List<SimplifiedPokemonDetails>) : Fragment()
 
 {
-    private var currentPokemon : PokemonModel = team[0]
-    private var currentOpponent : PokemonModel = opponentTeam[0]
+    private var currentPokemon : SimplifiedPokemonDetails = team[0]
+    private var currentOpponent : SimplifiedPokemonDetails = opponentTeam[0]
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,20 +40,28 @@ class BattleFragment(private val team : List<PokemonModel>,
         setOpponentPokemonInformations(currentOpponent)
 
         (activity as MainActivity).chooseAction()
-
     }
 
-    private fun setCurrentPokemonInformations(pokemon : PokemonModel) {
+    private fun setCurrentPokemonInformations(pokemon : SimplifiedPokemonDetails) {
+        pokemon.loadDetails {
+            currentPokemonHP_textView.text = pokemon.hp.toString()
+        }
+
         currentPokemonName_textView.text = pokemon.name
 
         Glide
             .with(activity!!)
             .load(pokemon.sprite)
             .into(currentPokemon_imageView)
+
     }
 
-    private fun setOpponentPokemonInformations(pokemon : PokemonModel) {
+    private fun setOpponentPokemonInformations(pokemon : SimplifiedPokemonDetails) {
         opponentPokemonName_textView.text = pokemon.name
+
+        pokemon.loadDetails {
+            opponentPokementHP_textView.text = pokemon.hp.toString()
+        }
 
         Glide
             .with(activity!!)

@@ -115,7 +115,20 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onFightClicked(team: List<PokemonModel>, opponentTeam: List<PokemonModel>) {
-        goToFragment(BattleFragment(team, opponentTeam))
+
+        val teamSimplifiedPokemonDetails : List<SimplifiedPokemonDetails> = listOf (
+            SimplifiedPokemonDetails(team[0].name, team[0].sprite, team[0].types),
+            SimplifiedPokemonDetails(team[1].name, team[1].sprite, team[1].types),
+            SimplifiedPokemonDetails(team[2].name, team[2].sprite, team[2].types)
+        )
+
+        val opponentSimplifiedPokemonDetails : List<SimplifiedPokemonDetails> = listOf (
+            SimplifiedPokemonDetails(opponentTeam[0].name, opponentTeam[0].sprite, opponentTeam[0].types),
+            SimplifiedPokemonDetails(opponentTeam[0].name, opponentTeam[0].sprite, opponentTeam[0].types),
+            SimplifiedPokemonDetails(opponentTeam[0].name, opponentTeam[0].sprite, opponentTeam[0].types)
+        )
+
+        goToFragment(BattleFragment(teamSimplifiedPokemonDetails, opponentSimplifiedPokemonDetails))
     }
 
     override fun onDetailsClicked(pokemon: PokemonModel) {
