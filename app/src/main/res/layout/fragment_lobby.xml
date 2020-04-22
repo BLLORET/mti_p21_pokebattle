@@ -15,6 +15,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="firstOpponent_imageView,firstOpponent_name_textView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/firstOpponent_imageView"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/firstOpponent_imageView"
         android:layout_width="100dp"
@@ -28,18 +38,19 @@
 
     <ImageView
         android:id="@+id/firstOpponent_type1_imageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:contentDescription="@string/picture_description_type"
-        app:layout_constraintStart_toEndOf="@+id/firstOpponent_imageView"
+        app:layout_constraintBottom_toTopOf="@+id/firstOpponent_type2_imageView"
+        app:layout_constraintStart_toEndOf="@id/barrier"
         app:layout_constraintTop_toTopOf="@+id/firstOpponent_imageView" />
 
     <ImageView
         android:id="@+id/firstOpponent_type2_imageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:contentDescription="@string/picture_description_type"
         app:layout_constraintBottom_toBottomOf="@+id/firstOpponent_name_textView"
         app:layout_constraintEnd_toEndOf="@+id/firstOpponent_type1_imageView"
@@ -50,7 +61,10 @@
         android:id="@+id/firstOpponent_name_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="cursive"
         android:text="@string/label_default_pokemon_name"
+        android:textColor="#000000"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="@+id/firstOpponent_imageView"
         app:layout_constraintStart_toStartOf="@+id/firstOpponent_imageView"
         app:layout_constraintTop_toBottomOf="@+id/firstOpponent_imageView" />
@@ -59,8 +73,8 @@
         android:id="@+id/btn_fight"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/btn_fight"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
@@ -107,8 +121,8 @@
 
     <ImageView
         android:id="@+id/selectedPokemon_type1_imageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginBottom="8dp"
         android:contentDescription="@string/picture_description_type"
         app:layout_constraintBottom_toTopOf="@+id/leftVerticalDivider"
@@ -118,8 +132,8 @@
 
     <ImageView
         android:id="@+id/selectedPokemon_type2_imageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:contentDescription="@string/picture_description_type"
         app:layout_constraintBottom_toBottomOf="@+id/selectedPokemon_type1_imageView"
         app:layout_constraintEnd_toEndOf="parent"
@@ -130,7 +144,7 @@
     <View
         android:id="@+id/leftVerticalDivider"
         android:layout_width="1dp"
-        android:layout_height="200dp"
+        android:layout_height="190dp"
         android:background="@color/dividerColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/rightVerticalDivider"
@@ -203,7 +217,7 @@
         app:layout_constraintBottom_toTopOf="@+id/chosenPokemon1_name_textView"
         app:layout_constraintEnd_toStartOf="@+id/rightVerticalDivider"
         app:layout_constraintStart_toEndOf="@+id/leftVerticalDivider"
-        app:layout_constraintTop_toBottomOf="@+id/btn_choosePokemon2"/>
+        app:layout_constraintTop_toBottomOf="@+id/btn_choosePokemon2" />
 
     <ImageView
         android:id="@+id/chosenPokemon3_background_imageView"
@@ -218,7 +232,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@id/rightVerticalDivider"
-        app:layout_constraintTop_toBottomOf="@+id/btn_choosePokemon2"/>
+        app:layout_constraintTop_toBottomOf="@+id/btn_choosePokemon2" />
 
     <TextView
         android:id="@+id/chosenPokemon1_name_textView"
@@ -254,10 +268,6 @@
         android:id="@+id/chosenPokemon1_imageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
         android:contentDescription="@string/picture_description_pokemon"
         app:layout_constraintBottom_toBottomOf="@+id/chosenPokemon1_background_imageView"
         app:layout_constraintEnd_toEndOf="@+id/chosenPokemon1_background_imageView"
@@ -270,10 +280,6 @@
         android:id="@+id/chosenPokemon2_imageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
         android:contentDescription="@string/picture_description_pokemon"
         app:layout_constraintBottom_toBottomOf="@+id/chosenPokemon2_background_imageView"
         app:layout_constraintEnd_toEndOf="@+id/chosenPokemon2_background_imageView"
@@ -285,10 +291,6 @@
         android:id="@+id/chosenPokemon3_imageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
         android:contentDescription="@string/picture_description_pokemon"
         app:layout_constraintBottom_toBottomOf="@+id/chosenPokemon3_background_imageView"
         app:layout_constraintEnd_toEndOf="@+id/chosenPokemon3_background_imageView"
