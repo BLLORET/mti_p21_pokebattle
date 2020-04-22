@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="100dp">
+
+    <ImageView
+        android:id="@+id/itemBattlePokemon_imageView"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@string/picture_description_pokemon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/itemBattlePokemonName_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/label_default_pokemon_name"
+        app:layout_constraintBottom_toTopOf="@id/itemBattlePokemonHPLabel_textView"
+        app:layout_constraintEnd_toStartOf="@+id/itemPokemonBattleType1_imageView"
+        app:layout_constraintStart_toEndOf="@+id/itemBattlePokemon_imageView"
+        app:layout_constraintTop_toTopOf="@+id/itemBattlePokemon_imageView" />
+
+    <ImageView
+        android:id="@+id/itemPokemonBattleType1_imageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:contentDescription="@string/picture_description_type"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemPokemonBattleType2_imageView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/bug" />
+
+    <ImageView
+        android:id="@+id/itemPokemonBattleType2_imageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:contentDescription="@string/picture_description_type"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/bug" />
+
+    <TextView
+        android:id="@+id/itemBattlePokemonHPLabel_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/stats_life"
+        app:layout_constraintBottom_toBottomOf="@+id/itemBattlePokemon_imageView"
+        app:layout_constraintStart_toStartOf="@+id/itemBattlePokemonName_textView"
+        app:layout_constraintTop_toBottomOf="@+id/itemBattlePokemonName_textView" />
+
+    <TextView
+        android:id="@+id/itemBattlePokemonHPParams_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/itemBattlePokemonHPLabel_textView"
+        app:layout_constraintEnd_toEndOf="@+id/itemBattlePokemonName_textView"
+        app:layout_constraintStart_toEndOf="@+id/itemBattlePokemonHPLabel_textView"
+        app:layout_constraintTop_toTopOf="@+id/itemBattlePokemonHPLabel_textView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,5 +6,6 @@ package mti.p21.pokefight.model
 data class PokemonDetailsModel (
     val height : Int,
     val weight : Int,
-    val stats : List<Stat>
+    val stats : List<Stat>,
+    val moves : List<MoveObject>
 )

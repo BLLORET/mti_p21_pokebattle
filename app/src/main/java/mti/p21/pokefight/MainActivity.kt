@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.fragment_splash_screen.*
 import mti.p21.pokefight.fragment.*
+import mti.p21.pokefight.model.MoveModel
 import mti.p21.pokefight.model.PokeType
 import mti.p21.pokefight.model.PokemonModel
 import mti.p21.pokefight.model.SimplifiedPokemonDetails
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity(),
                      LobbyFragment.LobbyTypeClicked,
                      LobbyFragment.FightClicked,
                      BattleFragment.TurnSelection,
+                     BattleInteractionFragment.InteractionButtonClickedInterface,
                      PokedexListFragment.PokedexDetailsFragmentClicked {
 
     var data : List<PokemonModel>? = null
@@ -107,10 +109,17 @@ class MainActivity : AppCompatActivity(),
             .commit()
     }
 
-    override fun chooseAction() {
+    override fun chooseAction(pokemons : List<SimplifiedPokemonDetails>, position: Int) {
+
+        val argumentBundle = Bundle()
+        argumentBundle.putInt("Position", position)
+
+        val fragment = BattleInteractionFragment(pokemons)
+        fragment.arguments = argumentBundle
+
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.interaction_container, BattleInteractionFragment())
+            .replace(R.id.interaction_container, fragment)
             .commit()
     }
 
@@ -141,5 +150,21 @@ class MainActivity : AppCompatActivity(),
         detailsPokemonFragment.arguments = argumentsBundle
 
         goToFragment(detailsPokemonFragment)
+    }
+
+    private fun changeInteractionZoneFragment(fragment: Fragment) {
+        supportFragmentManager
+            .beginTransaction()
+            .addToBackStack(null)
+            .replace(R.id.interaction_container, fragment)
+            .commit()
+    }
+
+    override fun onAttackClicked(moves: List<MoveModel>) {
+        changeInteractionZoneFragment(BattleMovesFragment(moves))
+    }
+
+    override fun onPokemonClicked(pokemons: List<SimplifiedPokemonDetails>) {
+        changeInteractionZoneFragment(BattlePokemonsFragment(pokemons))
     }
 }

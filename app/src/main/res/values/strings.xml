@@ -18,7 +18,9 @@
     <string name="interaction_select_attack">Select an attack!</string>
     <string name="interaction_select_pokemon">Select a pokemon!</string>
 
+    <string name="label_default_attack">attack</string>
     <string name="label_default_pokemon_name">pokemon-name</string>
+    <string name="label_default_power">0</string>
     <string name="label_explanation">Welcome Trainer! You have a team of three pokemons and you will fight 3 wild pokemons in a row. But before the battle starts, you only know your first opponent. And remember, most Pokemons have strengths and weaknesses.
         Good Luck!</string>
     <string name="label_first_opponent">Your first opponent will be…</string>
