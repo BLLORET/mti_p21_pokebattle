@@ -9,13 +9,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.fragment_battle_pokemon_item.view.*
 import mti.p21.pokefight.R
 import mti.p21.pokefight.model.SimplifiedPokemonDetails
 
-class BattlePokemonAdapter(private val pokemons : List<SimplifiedPokemonDetails>,
-                           private val context: Context,
-                           private val resources : Resources
+class BattlePokemonAdapter(
+    private val pokemons: List<SimplifiedPokemonDetails>,
+    private val context: Context,
+    private val resources: Resources,
+    private val onClickedPokemonListener: View.OnClickListener
 ) : RecyclerView.Adapter<BattlePokemonAdapter.ViewHolder>() {
 
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
@@ -30,6 +31,9 @@ class BattlePokemonAdapter(private val pokemons : List<SimplifiedPokemonDetails>
         val rowView : View = LayoutInflater.from(context)
                                            .inflate(R.layout.fragment_battle_pokemon_item,
                                                     parent, false)
+
+        rowView.setOnClickListener(onClickedPokemonListener)
+
         return ViewHolder(rowView)
     }
 

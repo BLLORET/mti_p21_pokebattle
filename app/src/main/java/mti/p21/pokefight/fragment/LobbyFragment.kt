@@ -45,7 +45,9 @@ class LobbyFragment : Fragment() {
         }
 
         btn_fight.setOnClickListener {
-            (activity as MainActivity).onFightClicked(team as List<PokemonModel>, pokemonsOpponents)
+            // Cast mutable? to list
+            val teamList = listOf(team[0]!!, team[1]!!, team[2]!!)
+            (activity as MainActivity).onFightClicked(teamList, pokemonsOpponents)
         }
 
         // Opponent zone
@@ -198,6 +200,6 @@ class LobbyFragment : Fragment() {
         /**
          * Open the battle fragment.
          */
-        fun onFightClicked(team : List<PokemonModel>, opponentTeam: List<PokemonModel>)
+        fun onFightClicked(team : List<PokemonModel>, opponents : List<PokemonModel>)
     }
 }

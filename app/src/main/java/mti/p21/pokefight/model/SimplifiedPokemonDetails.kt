@@ -86,6 +86,11 @@ data class SimplifiedPokemonDetails(
                 if (response.code() == 200) {
                     response.body()?.let {
                         it.moves.forEach { moveObject -> loadMove(moveObject.move.name, context) }
+
+                        // Sort it in place in alphabetical order
+                        moves.sortBy { move ->
+                            move.name
+                        }
                     }
                 }
             }

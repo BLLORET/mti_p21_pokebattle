@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import mti.p21.pokefight.R
 import mti.p21.pokefight.model.PokeType
 
-class HelpTypeAdapter(private val pokeTypes : List<PokeType>,
-                      private val context: Context,
-                      private val resources: Resources)
-    : RecyclerView.Adapter<HelpTypeAdapter.ViewHolder>() {
+class HelpTypeAdapter(
+    private val pokeTypes : List<PokeType>,
+    private val context: Context,
+    private val resources: Resources
+) : RecyclerView.Adapter<HelpTypeAdapter.ViewHolder>() {
 
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val pokeTypeImageView : ImageView = itemView.findViewById(R.id.helpItemType_imageView)

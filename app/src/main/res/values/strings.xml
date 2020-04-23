@@ -14,9 +14,9 @@
     <string name="btn_pokedex">POKEDEX</string>
     <string name="btn_change_pokemon">Pokemon</string>
 
-    <string name="interaction_select_action">Select an action!</string>
-    <string name="interaction_select_attack">Select an attack!</string>
-    <string name="interaction_select_pokemon">Select a pokemon!</string>
+    <string name="interaction_select_action">What will you do?</string>
+    <string name="interaction_select_move">Which move?</string>
+    <string name="interaction_select_pokemon">Choose a pokemon!</string>
 
     <string name="label_default_attack">attack</string>
     <string name="label_default_pokemon_name">pokemon-name</string>

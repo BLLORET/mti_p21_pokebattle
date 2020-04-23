@@ -11,10 +11,12 @@ import androidx.recyclerview.widget.RecyclerView
 import mti.p21.pokefight.R
 import mti.p21.pokefight.model.MoveModel
 
-class BattleMovesAdapter(private val moves : List<MoveModel>,
-                         private val context : Context,
-                         private val resources: Resources)
-    : RecyclerView.Adapter<BattleMovesAdapter.ViewHolder>() {
+class BattleMovesAdapter(
+    private val moves : List<MoveModel>,
+    private val context : Context,
+    private val resources: Resources,
+    private  val onItemClickListener: View.OnClickListener
+) : RecyclerView.Adapter<BattleMovesAdapter.ViewHolder>() {
 
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val moveNameTextView : TextView = itemView.findViewById(R.id.itemBattleMoveName_textView)
@@ -26,6 +28,8 @@ class BattleMovesAdapter(private val moves : List<MoveModel>,
         val rowView : View = LayoutInflater.from(context)
                                            .inflate(R.layout.fragment_battle_move_item,
                                                     parent, false)
+        rowView.setOnClickListener(onItemClickListener)
+
         return ViewHolder(rowView)
     }
 

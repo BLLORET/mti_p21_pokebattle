@@ -5,18 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.fragment_pokedex_details.*
 import kotlinx.android.synthetic.main.fragment_pokedex_list.*
 import mti.p21.pokefight.MainActivity
-
 import mti.p21.pokefight.R
 import mti.p21.pokefight.adapter.PokemonModelAdapter
 import mti.p21.pokefight.model.PokemonModel
-import kotlin.reflect.typeOf
 
 /**
  * [PokedexListFragment] represent the fragment of the pokedex list view.
@@ -36,14 +30,15 @@ class PokedexListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val details = View.OnClickListener {
-            val pokemon = pokemons[it.tag as Int] as PokemonModel
+        val onDetailClickedListener = View.OnClickListener {
+            val pokemon = pokemons[it.tag as Int]
             (activity as PokedexDetailsFragmentClicked).onDetailsClicked(pokemon)
         }
 
         pokemons = (activity as MainActivity).data!!
         recycler_container.layoutManager = LinearLayoutManager(activity)
-        recycler_container.adapter = PokemonModelAdapter(pokemons, activity!!, resources, details)
+        recycler_container.adapter = PokemonModelAdapter(pokemons, activity!!, resources,
+                                                         onDetailClickedListener)
     }
 
     interface PokedexDetailsFragmentClicked {

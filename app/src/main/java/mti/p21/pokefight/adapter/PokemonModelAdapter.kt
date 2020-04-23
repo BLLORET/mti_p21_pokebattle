@@ -17,11 +17,12 @@ import mti.p21.pokefight.model.PokemonModel
  * @param data : The list of pokemon
  * @param context : The context of the adapter
  */
-class PokemonModelAdapter(private val data : List<PokemonModel>,
-                          private val context : Context,
-                          private  val resource : Resources,
-                          private  val onItemClickListener: View.OnClickListener)
-    : RecyclerView.Adapter<PokemonModelAdapter.ViewHolder>() {
+class PokemonModelAdapter(
+    private val data : List<PokemonModel>,
+    private val context : Context,
+    private  val resource : Resources,
+    private  val onItemClickListener: View.OnClickListener
+) : RecyclerView.Adapter<PokemonModelAdapter.ViewHolder>() {
 
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val pokemonNameTextView : TextView = itemView.findViewById(R.id.item_pokemon_name_textView)
