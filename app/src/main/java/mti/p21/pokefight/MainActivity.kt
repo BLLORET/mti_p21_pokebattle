@@ -3,13 +3,11 @@ package mti.p21.pokefight
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.fragment_splash_screen.*
 import mti.p21.pokefight.fragment.*
-import mti.p21.pokefight.model.MoveModel
 import mti.p21.pokefight.model.PokeType
 import mti.p21.pokefight.model.PokemonModel
 import mti.p21.pokefight.model.SimplifiedPokemonDetails
@@ -20,18 +18,9 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class MainActivity
-    : AppCompatActivity(),
-    SplashScreenFragment.SplashScreenButtonClicked,
-    LobbyFragment.LobbyTypeClicked,
-    LobbyFragment.FightClicked,
-    BattleFragment.TurnSelection,
-    BattleInteractionFragment.InteractionButtonClickedInterface,
-    BattleMovesFragment.MoveClickedInterface,
-    BattlePokemonsFragment.PokemonClickedInterface,
-    PokedexListFragment.PokedexDetailsFragmentClicked {
+class MainActivity : AppCompatActivity(), FragmentInteractionsInterface, BattleInteractionsInterface {
 
-    var data : List<PokemonModel>? = null
+    var data: List<PokemonModel>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,20 +39,23 @@ class MainActivity
      * Load Pokemons on the internet and store it in [data]
      */
     private fun loadPokemonModels() {
-        val baseURL = "https://www.surleweb.xyz/api/"
-        val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
-        val retrofit = Retrofit.Builder()
-            .baseUrl(baseURL)
-            .addConverterFactory(jsonConverter)
+
+        val service = Retrofit.Builder()
+            .baseUrl("https://www.surleweb.xyz/api/")
+            .addConverterFactory(
+                GsonConverterFactory.create(
+                    GsonBuilder().create()
+                )
+            )
             .build()
+            .create(PokemonModelInterface::class.java)
 
-        val service : PokemonModelInterface = retrofit.create(PokemonModelInterface::class.java)
-
-        val wsServiceCallback : Callback<List<PokemonModel>> = object : Callback<List<PokemonModel>> {
+        val wsCallback : Callback<List<PokemonModel>> = object: Callback<List<PokemonModel>> {
             override fun onFailure(call: Call<List<PokemonModel>>, t: Throwable) {
                 Toast.makeText(this@MainActivity,
-                          "Cannot load pokemons, make sure you have internet",
+                          "Failed to load pokemons, make sure you have internet",
                                Toast.LENGTH_LONG).show()
+                Log.w("Pokemons", "Cannot load all pokemons in API: $t")
             }
 
             override fun onResponse(
@@ -81,17 +73,21 @@ class MainActivity
                 }
             }
         }
-        service.getAllPokemons().enqueue(wsServiceCallback)
+
+        service.getAllPokemons().enqueue(wsCallback)
     }
 
-    override fun onBattleClicked() {
+    override fun onBattleButtonClicked() {
         goToFragment(LobbyFragment())
     }
 
-    override fun onPokedexClicked() {
+    override fun onPokedexButtonClicked() {
         goToFragment(PokedexListFragment())
     }
 
+    /**
+     * Intermediary function to switch the main fragment
+     */
     private fun goToFragment(fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
@@ -100,7 +96,7 @@ class MainActivity
             .commit()
     }
 
-    override fun onTypeClicked(pokeType : PokeType) {
+    override fun onTypePictureClicked(pokeType: PokeType) {
 
         val argumentsBundle = Bundle()
         argumentsBundle.putSerializable("PokeType", pokeType)
@@ -116,21 +112,7 @@ class MainActivity
             .commit()
     }
 
-    override fun chooseAction(gameManager: GameManager) {
-
-        val argumentBundle = Bundle()
-        argumentBundle.putSerializable("GameManager", gameManager)
-
-        val fragment = BattleInteractionFragment()
-        fragment.arguments = argumentBundle
-
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.interaction_container, fragment)
-            .commit()
-    }
-
-    override fun onFightClicked(team: List<PokemonModel>, opponents : List<PokemonModel>) {
+    override fun onFightButtonClicked(team: List<PokemonModel>, opponents: List<PokemonModel>) {
 
         val teamSimplifiedPokemonDetails : List<SimplifiedPokemonDetails> = listOf (
             SimplifiedPokemonDetails(team[0].name, team[0].sprite, team[0].types),
@@ -147,7 +129,7 @@ class MainActivity
         goToFragment(BattleFragment(teamSimplifiedPokemonDetails, opponentSimplifiedPokemonDetails))
     }
 
-    override fun onDetailsClicked(pokemon: PokemonModel) {
+    override fun onPokedexRowClicked(pokemon: PokemonModel) {
         val argumentsBundle = Bundle()
         val simplifiedPokemon = SimplifiedPokemonDetails(pokemon.name, pokemon.sprite, pokemon.types)
 
@@ -159,51 +141,27 @@ class MainActivity
         goToFragment(detailsPokemonFragment)
     }
 
-    private fun changeInteractionZoneFragment(fragment: Fragment) {
+    private fun changeInteractionZoneFragment(fragment: Fragment, gameManager: GameManager) {
+        val argumentBundle = Bundle()
+        argumentBundle.putSerializable("GameManager", gameManager)
+
+        fragment.arguments = argumentBundle
+
         supportFragmentManager
             .beginTransaction()
-            .addToBackStack(null)
             .replace(R.id.interaction_container, fragment)
             .commit()
     }
 
-    override fun onAttackClicked(gameManager: GameManager) {
-        val argumentsBundle = Bundle()
-        argumentsBundle.putSerializable("GameManager", gameManager)
-
-        val fragment = BattleMovesFragment()
-        fragment.arguments = argumentsBundle
-
-        changeInteractionZoneFragment(fragment)
+    override fun chooseAction(gameManager: GameManager, enableButtons: Boolean) {
+        changeInteractionZoneFragment(BattleInteractionFragment(enableButtons), gameManager)
     }
 
-    override fun onPokemonClicked(gameManager: GameManager) {
-        val argumentsBundle = Bundle()
-        argumentsBundle.putSerializable("GameManager", gameManager)
-
-        val fragment = BattlePokemonsFragment()
-        fragment.arguments = argumentsBundle
-
-        changeInteractionZoneFragment(fragment)
+    override fun onAttackButtonClicked(gameManager: GameManager) {
+        changeInteractionZoneFragment(BattleMovesFragment(), gameManager)
     }
 
-    override fun onMoveClicked(gameManager: GameManager) {
-        val argumentsBundle = Bundle()
-        argumentsBundle.putSerializable("GameManager", gameManager)
-
-        val fragment = BattleInteractionFragment()
-        fragment.arguments = argumentsBundle
-
-        changeInteractionZoneFragment(fragment)
-    }
-
-    override fun onPokemonChangeClicked(gameManager: GameManager) {
-        val argumentsBundle = Bundle()
-        argumentsBundle.putSerializable("GameManager", gameManager)
-
-        val fragment = BattleInteractionFragment(true)
-        fragment.arguments = argumentsBundle
-
-        changeInteractionZoneFragment(fragment)
+    override fun onPokemonButtonClicked(gameManager: GameManager) {
+        changeInteractionZoneFragment(BattlePokemonsFragment(), gameManager)
     }
 }

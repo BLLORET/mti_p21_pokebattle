@@ -6,17 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import kotlinx.android.synthetic.main.fragment_battle.*
 import kotlinx.android.synthetic.main.fragment_battle_interaction.*
 import mti.p21.pokefight.GameManager
 import mti.p21.pokefight.MainActivity
-
 import mti.p21.pokefight.R
-import mti.p21.pokefight.model.MoveModel
-import mti.p21.pokefight.model.SimplifiedPokemonDetails
 
 /**
- * A simple [Fragment] subclass.
+ * [BattleInteractionFragment] that represent the fragment on which the player
+ * have to chose it next action.
  */
 class BattleInteractionFragment(private val enableButtons : Boolean = false) : Fragment() {
 
@@ -33,7 +30,7 @@ class BattleInteractionFragment(private val enableButtons : Boolean = false) : F
 
         // Case when we come from pokemon battle choice
         if (enableButtons) {
-            val informationText : TextView = activity!!.findViewById(R.id.informations_textView)
+            val informationText: TextView = activity!!.findViewById(R.id.informations_textView)
             informationText.text = getString(R.string.interaction_select_action)
         }
 
@@ -44,18 +41,12 @@ class BattleInteractionFragment(private val enableButtons : Boolean = false) : F
             val gameManager = it.getSerializable("GameManager") as GameManager
 
             btn_battle_attack.setOnClickListener {
-                (activity as MainActivity).onAttackClicked(gameManager)
+                (activity as MainActivity).onAttackButtonClicked(gameManager)
             }
 
             btn_battle_pokemon.setOnClickListener {
-                (activity as MainActivity).onPokemonClicked(gameManager)
+                (activity as MainActivity).onPokemonButtonClicked(gameManager)
             }
         }
-    }
-
-    interface InteractionButtonClickedInterface {
-        fun onAttackClicked(gameManager: GameManager)
-
-        fun onPokemonClicked(gameManager: GameManager)
     }
 }

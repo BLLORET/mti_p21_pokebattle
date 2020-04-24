@@ -12,6 +12,9 @@ import com.bumptech.glide.Glide
 import mti.p21.pokefight.R
 import mti.p21.pokefight.model.SimplifiedPokemonDetails
 
+/**
+ * Represent an adapter to display pokemon informations to a recycler view.
+ */
 class BattlePokemonAdapter(
     private val pokemons: List<SimplifiedPokemonDetails>,
     private val context: Context,
@@ -20,13 +23,18 @@ class BattlePokemonAdapter(
 ) : RecyclerView.Adapter<BattlePokemonAdapter.ViewHolder>() {
 
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
-        val pokemonImageView : ImageView = itemView.findViewById(R.id.itemBattlePokemon_imageView)
-        val pokemonType1ImageView : ImageView = itemView.findViewById(R.id.itemPokemonBattleType1_imageView)
-        val pokemonType2ImageView : ImageView = itemView.findViewById(R.id.itemPokemonBattleType2_imageView)
-        val pokemonNameTextView : TextView = itemView.findViewById(R.id.itemBattlePokemonName_textView)
-        val pokemonHPTextView : TextView = itemView.findViewById(R.id.itemBattlePokemonHPParams_textView)
+        val pokemonImageView: ImageView = itemView.findViewById(R.id.itemBattlePokemon_imageView)
+        val pokemonType1ImageView: ImageView = itemView.findViewById(R.id.itemPokemonBattleType1_imageView)
+        val pokemonType2ImageView: ImageView = itemView.findViewById(R.id.itemPokemonBattleType2_imageView)
+        val pokemonNameTextView: TextView = itemView.findViewById(R.id.itemBattlePokemonName_textView)
+        val pokemonHPTextView: TextView = itemView.findViewById(R.id.itemBattlePokemonHPParams_textView)
     }
 
+    /**
+     * Called when the ViewHolder is created to create the RowView.
+     * @param parent : The ViewGroup on which attach the ViewHolder
+     * @return Returns the ViewHolder
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val rowView : View = LayoutInflater.from(context)
                                            .inflate(R.layout.fragment_battle_pokemon_item,
@@ -37,14 +45,23 @@ class BattlePokemonAdapter(
         return ViewHolder(rowView)
     }
 
+    /**
+     * Get the number of items
+     * @return Returns the size of the list
+     */
     override fun getItemCount(): Int {
         return pokemons.size
     }
 
+    /**
+     * Called to display items in the RecyclerView.
+     * @param holder : Represent the viewHolder
+     * @param position : The position of the item to display
+     */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.tag = position
 
-        val pokemon : SimplifiedPokemonDetails = pokemons[position]
+        val pokemon: SimplifiedPokemonDetails = pokemons[position]
 
         Glide
             .with(context)
@@ -60,6 +77,4 @@ class BattlePokemonAdapter(
         holder.pokemonNameTextView.text = pokemon.name
         holder.pokemonHPTextView.text = pokemon.hp.toString()
     }
-
-
 }
