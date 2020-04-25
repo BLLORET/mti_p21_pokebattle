@@ -179,10 +179,13 @@ class GameManager (
             delay(delayTime)
 
             if (checkPokemonIsDead(currentPokemon)) {
+                // Make the pokemon image empty
+                fragment.findViewById<ImageView>(R.id.currentPokemon_imageView).setImageResource(0)
                 delay(delayTime)
-                if (!gameIsFinished())
+                if (!gameIsFinished()) {
+
                     (fragment as MainActivity).onPokemonButtonClicked(this@GameManager)
-                else {
+                } else {
                     battleOver(false)
                 }
             }
@@ -196,7 +199,9 @@ class GameManager (
                 }
             }
 
-            // Enables button when the turn is finished
+            // Enables button when the turn is finished and set the information view
+            val infoText = fragment.getString(R.string.interaction_select_action)
+            fragment.findViewById<TextView>(R.id.informations_textView).text = infoText
             fragment.findViewById<Button>(R.id.btn_battle_attack).isEnabled = true
             fragment.findViewById<Button>(R.id.btn_battle_pokemon).isEnabled = true
         }
@@ -223,7 +228,7 @@ class GameManager (
         pokemonDefender: SimplifiedPokemonDetails,
         move: MoveModel
     ): Int {
-        val damageRelations = loadDamageRelations(move.type.name)
+        val damageRelations = pokemonAttacker.temporary//loadDamageRelations(move.type.name)
 
         var damages: Int = calculateDamage(
             pokemonAttacker = pokemonAttacker,

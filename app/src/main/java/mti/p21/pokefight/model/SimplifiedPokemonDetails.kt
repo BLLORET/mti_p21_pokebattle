@@ -35,6 +35,8 @@ class SimplifiedPokemonDetails(
 
     val pokeApiInterface: PokeApiInterface = getPokeAPIService()
 
+    lateinit var temporary: DamageRelations
+
     /**
      * Get the pokeApiService to make request to it.
      */
@@ -74,6 +76,26 @@ class SimplifiedPokemonDetails(
                         defenseSpe = stats.find{ st -> st.stat.name == "special-defense"}!!.base_stat
                         defense = stats.find{ st -> st.stat.name == "defense"}!!.base_stat
                         hp = stats.find{ st -> st.stat.name == "hp"}!!.base_stat
+
+                        pokeApiInterface.getDamageRelations(types[0].name).enqueue(
+                            object: Callback<TypeModel> {
+                                override fun onFailure(call: Call<TypeModel>, t: Throwable) {
+                                    Log.w("Damage:", "t")
+                                }
+
+                                override fun onResponse(
+                                    call: Call<TypeModel>,
+                                    response: Response<TypeModel>
+                                ) {
+                                    if (response.code() == 200) {
+                                        response.body()?.let {tyty ->
+                                            temporary = tyty.damage_relations
+                                        }
+                                    }
+                                }
+
+                            }
+                        )
                     }
                 }
                 detailsCounter--
