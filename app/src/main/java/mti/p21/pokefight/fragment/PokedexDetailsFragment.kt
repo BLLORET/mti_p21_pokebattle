@@ -5,8 +5,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_pokedex_details.*
+import kotlinx.coroutines.delay
 import mti.p21.pokefight.R
 import mti.p21.pokefight.model.SimplifiedPokemonDetails
 
@@ -32,9 +34,22 @@ class PokedexDetailsFragment : Fragment() {
         }
     }
 
-    private fun loadPokemonDetails(pokemon : SimplifiedPokemonDetails) {
-        pokemon.loadDetails {
-            details_pokemon_TextView_Name.text = pokemon.name
+    /**
+     * Load details about the current pokemon an display them in the details screen.
+     */
+    private fun loadPokemonDetails(pokemon: SimplifiedPokemonDetails) {
+
+        pokemon.detailsCounter++
+        pokemon.getPokeAPIService().getPokemonDetails(pokemon.name).enqueue(
+            pokemon.loadCallBackPokemonDetails(activity!!)
+        )
+
+        // Set when the call is finished
+        lifecycleScope.launchWhenStarted {
+
+            while (pokemon.detailsCounter > 0) {
+                delay(500)
+            }
             details_pokemon_TextView_Attack_Param.text = pokemon.attack.toString()
             details_pokemon_TextView_Defense_Param.text = pokemon.defense.toString()
             details_pokemon_TextView_HP_Param.text = pokemon.hp.toString()
@@ -51,15 +66,14 @@ class PokedexDetailsFragment : Fragment() {
             .load(pokemon.sprite)
             .into(details_pokemon_ImageView_Pokemon)
 
+        details_pokemon_TextView_Name.text = pokemon.name
+
         details_pokemon_ImageView_Type1.setImageResource(
             pokemon.types[0].getPictureID(resources, activity!!)
         )
         details_pokemon_ImageView_Type2.setImageResource(
-            if (pokemon.types.size > 1) {
-                pokemon.types[1].getPictureID(resources, activity!!)
-            } else {
-                0
-            }
+            if (pokemon.types.size > 1) pokemon.types[1].getPictureID(resources, activity!!)
+            else 0
         )
     }
 }

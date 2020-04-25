@@ -9,11 +9,11 @@ import retrofit2.http.Path
 
 interface PokeApiInterface {
     @GET("type/{name}")
-    fun getDamageRelations(@Path("name") name : String) : Call<TypeModel>
+    fun getDamageRelations(@Path("name") name: String) : Call<TypeModel>
 
     @GET("pokemon/{name}")
-    fun getPokemonDetails(@Path("name") name : String) : Call<PokemonDetailsModel>
+    fun getPokemonDetails(@Path("name") name: String) : Call<PokemonDetailsModel>
 
     @GET("move/{name}")
-    fun getMoveDetails(@Path("name") name : String) : Call<MoveModel>
+    fun getMoveDetails(@Path("name") name: String) : Call<MoveModel>
 }

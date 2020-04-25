@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,7 +16,7 @@ import mti.p21.pokefight.adapter.BattlePokemonAdapter
 import mti.p21.pokefight.model.SimplifiedPokemonDetails
 
 /**
- * A simple [Fragment] subclass.
+ * [BattlePokemonsFragment] that represent the fragment to choose the new pokemon to call.
  */
 class BattlePokemonsFragment() : Fragment() {
 
@@ -32,8 +31,8 @@ class BattlePokemonsFragment() : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         arguments?.let { bundle ->
-            val gameManager : GameManager = bundle.getSerializable("GameManager") as GameManager
-            val pokemons : List<SimplifiedPokemonDetails> = gameManager.team
+            val gameManager = bundle.getSerializable("GameManager") as GameManager
+            val pokemons: List<SimplifiedPokemonDetails> = gameManager.team
 
             val informationTextView: TextView = activity!!.findViewById(R.id.informations_textView)
             informationTextView.text = getString(R.string.interaction_select_pokemon)
@@ -41,11 +40,12 @@ class BattlePokemonsFragment() : Fragment() {
             val onClickedPokemonListener = View.OnClickListener {
                 val newPokemonIndex = it.tag as Int
 
-                if (gameManager.currentPokemonIndex != newPokemonIndex) {
-                    gameManager.currentPokemonIndex = newPokemonIndex
-                    gameManager.loadCurrentPokemonInformations(true)
+                if (gameManager.currentPokemonIndex != newPokemonIndex &&
+                    gameManager.team[newPokemonIndex].hp != 0) {
 
-                    (activity as MainActivity).onPokemonChangeClicked(gameManager)
+                    gameManager.currentPokemonIndex = newPokemonIndex
+                    gameManager.loadCurrentPokemonInformations()
+                    (activity as MainActivity).chooseAction(gameManager, true)
                 }
             }
 
@@ -59,9 +59,5 @@ class BattlePokemonsFragment() : Fragment() {
                 )
             )
         }
-    }
-
-    interface PokemonClickedInterface {
-        fun onPokemonChangeClicked(gameManager: GameManager)
     }
 }

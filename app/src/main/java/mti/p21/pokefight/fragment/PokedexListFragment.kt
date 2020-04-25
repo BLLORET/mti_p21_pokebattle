@@ -30,18 +30,14 @@ class PokedexListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val onDetailClickedListener = View.OnClickListener {
+        val onPokemonDetailsClickedListener = View.OnClickListener {
             val pokemon = pokemons[it.tag as Int]
-            (activity as PokedexDetailsFragmentClicked).onDetailsClicked(pokemon)
+            (activity as MainActivity).onPokedexRowClicked(pokemon)
         }
 
         pokemons = (activity as MainActivity).data!!
         recycler_container.layoutManager = LinearLayoutManager(activity)
         recycler_container.adapter = PokemonModelAdapter(pokemons, activity!!, resources,
-                                                         onDetailClickedListener)
-    }
-
-    interface PokedexDetailsFragmentClicked {
-        fun onDetailsClicked(pokemon: PokemonModel)
+                                                         onPokemonDetailsClickedListener)
     }
 }

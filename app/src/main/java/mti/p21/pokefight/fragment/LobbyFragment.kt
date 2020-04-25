@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_lobby.*
 import mti.p21.pokefight.MainActivity
-
 import mti.p21.pokefight.R
 import mti.p21.pokefight.adapter.PokemonModelAdapter
 import mti.p21.pokefight.model.PokeType
@@ -23,10 +22,10 @@ import mti.p21.pokefight.model.PokemonModel
  */
 class LobbyFragment : Fragment() {
 
-    private lateinit var pokemons : List<PokemonModel>
-    private lateinit var pokemonsOpponents : List<PokemonModel>
-    private var team : MutableList<PokemonModel?> = MutableList(3) { null }
-    private var selectedPokemon : PokemonModel? = null
+    private lateinit var pokemons: List<PokemonModel>
+    private lateinit var pokemonsOpponents: List<PokemonModel>
+    private var team: MutableList<PokemonModel?> = MutableList(3) { null }
+    private var selectedPokemon: PokemonModel? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,14 +39,14 @@ class LobbyFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Get the list au pokemon sorted by type1 then type2 if it exists
-        pokemons = (activity as MainActivity).data!!.sortedBy {pokemon ->
+        pokemons = (activity as MainActivity).data!!.sortedBy { pokemon ->
             pokemon.types.map { type -> type.name }.reduce { acc, pokeType -> acc + pokeType}
         }
 
         btn_fight.setOnClickListener {
             // Cast mutable? to list
             val teamList = listOf(team[0]!!, team[1]!!, team[2]!!)
-            (activity as MainActivity).onFightClicked(teamList, pokemonsOpponents)
+            (activity as MainActivity).onFightButtonClicked(teamList, pokemonsOpponents)
         }
 
         // Opponent zone
@@ -92,16 +91,16 @@ class LobbyFragment : Fragment() {
      * Set listeners on the first opponent to see help associated.
      */
     private fun setFirstOpponentsListeners() {
-        val firstOpponentTypes : List<PokeType> = pokemonsOpponents[0].types
+        val firstOpponentTypes: List<PokeType> = pokemonsOpponents[0].types
 
         firstOpponent_type1_imageView.setOnClickListener {
-            (activity as MainActivity).onTypeClicked(firstOpponentTypes[0])
+            (activity as MainActivity).onTypePictureClicked(firstOpponentTypes[0])
         }
 
         if (firstOpponentTypes.size > 1)
         {
             firstOpponent_type2_imageView.setOnClickListener {
-                (activity as MainActivity).onTypeClicked(firstOpponentTypes[1])
+                (activity as MainActivity).onTypePictureClicked(firstOpponentTypes[1])
             }
         }
     }
@@ -110,9 +109,11 @@ class LobbyFragment : Fragment() {
      * Set view associated to the corresponding to the wanted
      * pokemon position with the selected pokemon
      */
-    private fun setPokemonTeam(teamNumber : Int,
-                               imageView: ImageView,
-                               pokemonNameTextView : TextView) {
+    private fun setPokemonTeam(
+        teamNumber: Int,
+        imageView: ImageView,
+        pokemonNameTextView: TextView
+    ) {
         if (selectedPokemon != null) {
             team[teamNumber] = selectedPokemon
 
@@ -130,11 +131,13 @@ class LobbyFragment : Fragment() {
     /**
      * Get random opponents in the pokemon database
      */
-    private fun getOpponents() : List<PokemonModel> {
-        val randomPokemons : List<PokemonModel> = pokemons.shuffled()
-        return listOf(randomPokemons[0],
-                      randomPokemons[1],
-                      randomPokemons[2])
+    private fun getOpponents(): List<PokemonModel> {
+        val randomPokemons: List<PokemonModel> = pokemons.shuffled()
+        return listOf(
+            randomPokemons[0],
+            randomPokemons[1],
+            randomPokemons[2]
+        )
     }
 
     /**
@@ -185,21 +188,8 @@ class LobbyFragment : Fragment() {
      * Activate the button fight if the team is complete
      */
     private fun activateButtonFight() {
-        if (!team.contains(null) && btn_fight.visibility != View.VISIBLE)
+        if (!team.contains(null) && btn_fight.visibility != View.VISIBLE) {
             btn_fight.visibility = View.VISIBLE
-    }
-
-    interface LobbyTypeClicked {
-        /**
-         * Open an help fragment.
-         */
-        fun onTypeClicked(pokeType: PokeType)
-    }
-
-    interface FightClicked {
-        /**
-         * Open the battle fragment.
-         */
-        fun onFightClicked(team : List<PokemonModel>, opponents : List<PokemonModel>)
+        }
     }
 }

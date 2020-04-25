@@ -13,27 +13,26 @@ import mti.p21.pokefight.R
 import mti.p21.pokefight.model.PokemonModel
 
 /**
- * [PokemonModelAdapter] Represent the adapter that fill the wanted RecyclerView.
+ * [PokemonModelAdapter] Represent the adapter that fill the RecyclerView of list of pokemons.
  * @param data : The list of pokemon
  * @param context : The context of the adapter
  */
 class PokemonModelAdapter(
-    private val data : List<PokemonModel>,
-    private val context : Context,
-    private  val resource : Resources,
+    private val data: List<PokemonModel>,
+    private val context: Context,
+    private  val resource: Resources,
     private  val onItemClickListener: View.OnClickListener
 ) : RecyclerView.Adapter<PokemonModelAdapter.ViewHolder>() {
 
-    class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
-        val pokemonNameTextView : TextView = itemView.findViewById(R.id.item_pokemon_name_textView)
-        val pokemonType1ImageView : ImageView = itemView.findViewById(R.id.item_type1_imageView)
-        val pokemonType2ImageView : ImageView = itemView.findViewById(R.id.item_type2_imageView)
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val pokemonNameTextView: TextView = itemView.findViewById(R.id.item_pokemon_name_textView)
+        val pokemonType1ImageView: ImageView = itemView.findViewById(R.id.item_type1_imageView)
+        val pokemonType2ImageView: ImageView = itemView.findViewById(R.id.item_type2_imageView)
     }
 
     /**
      * Called when the ViewHolder is created to create the RowView.
      * @param parent : The ViewGroup on which attach the ViewHolder
-     * @param viewType :
      * @return Returns the ViewHolder
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -60,16 +59,16 @@ class PokemonModelAdapter(
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.tag = position
-        holder.pokemonNameTextView.text = data[position].name
+        val pokemon: PokemonModel = data[position]
+
+        holder.pokemonNameTextView.text = pokemon.name
 
         holder.pokemonType1ImageView.setImageResource(
-            data[position].types[0].getPictureID(resource, context)
+            pokemon.types[0].getPictureID(resource, context)
         )
         holder.pokemonType2ImageView.setImageResource(
-            if (data[position].types.size > 1)
-                data[position].types[1].getPictureID(resource, context)
-            else
-                0
+            if (pokemon.types.size > 1) pokemon.types[1].getPictureID(resource, context)
+            else 0
         )
     }
 }

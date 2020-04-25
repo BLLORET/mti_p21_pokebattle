@@ -11,6 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import mti.p21.pokefight.R
 import mti.p21.pokefight.model.MoveModel
 
+/**
+ * Represent the adapter to display moves in a recycler view.
+ */
 class BattleMovesAdapter(
     private val moves : List<MoveModel>,
     private val context : Context,
@@ -25,6 +28,11 @@ class BattleMovesAdapter(
         val moveCategoryImageView : ImageView = itemView.findViewById(R.id.itemBattleMoveCategoryAttack)
     }
 
+    /**
+     * Called when the ViewHolder is created to create the RowView.
+     * @param parent : The ViewGroup on which attach the ViewHolder
+     * @return Returns the ViewHolder
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val rowView : View = LayoutInflater.from(context)
                                            .inflate(R.layout.fragment_battle_move_item,
@@ -34,14 +42,23 @@ class BattleMovesAdapter(
         return ViewHolder(rowView)
     }
 
+    /**
+     * Get the number of items
+     * @return Returns the size of the list
+     */
     override fun getItemCount(): Int {
         return moves.size
     }
 
+    /**
+     * Called to display items in the RecyclerView.
+     * @param holder : Represent the viewHolder
+     * @param position : The position of the item to display
+     */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.tag = position
 
-        val move : MoveModel = moves[position]
+        val move: MoveModel = moves[position]
 
         holder.moveNameTextView.text = move.name
         holder.movePowerTextView.text = move.power.toString()

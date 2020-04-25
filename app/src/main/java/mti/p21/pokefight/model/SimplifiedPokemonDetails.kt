@@ -12,7 +12,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.Serializable
 
-data class SimplifiedPokemonDetails(
+/**
+ * Make a simplified class of the pokemon through different poke API calls
+ */
+class SimplifiedPokemonDetails(
     val name: String,
     val sprite: String,
     val types: List<PokeType>
@@ -27,10 +30,13 @@ data class SimplifiedPokemonDetails(
     var defenseSpe: Int = 0
     var moves : MutableList<MoveModel> = arrayListOf()
 
+    var detailsCounter: Int = 0
+    var movesCounter: Int = 0
+
     /**
      * Get the pokeApiService to make request to it.
      */
-    private fun getPokeApiService() : PokeApiInterface {
+    fun getPokeAPIService() : PokeApiInterface {
         val baseURL = "https://pokeapi.co/api/v2/"
         val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
         val retrofit = Retrofit.Builder()
@@ -42,14 +48,15 @@ data class SimplifiedPokemonDetails(
     }
 
     /**
-     * Load details in the API, apply the given function if it exist and and store details
+     * Load details in the API, and store them when the callback is called
      */
-    fun loadDetails(function : () -> Unit) {
+    fun loadCallBackPokemonDetails(context: Context) : Callback<PokemonDetailsModel> {
 
-        val wsServiceCallback : Callback<PokemonDetailsModel> = object :
-            Callback<PokemonDetailsModel> {
+        return object : Callback<PokemonDetailsModel> {
             override fun onFailure(call: Call<PokemonDetailsModel>, t: Throwable) {
-                Log.w("PokeApi", "Cannot load statistics of the $name pokemon")
+                Toast.makeText(context, "Failed to load stats of $name", Toast.LENGTH_LONG)
+                Log.w("PokeApi", "Cannot load statistics of the $name pokemon: $t")
+                detailsCounter--
             }
 
             override fun onResponse(call: Call<PokemonDetailsModel>, response: Response<PokemonDetailsModel>) {
@@ -65,37 +72,34 @@ data class SimplifiedPokemonDetails(
                         defenseSpe = stats.find{ st -> st.stat.name == "special-defense"}!!.base_stat
                         defense = stats.find{ st -> st.stat.name == "defense"}!!.base_stat
                         hp = stats.find{ st -> st.stat.name == "hp"}!!.base_stat
-
-                        function()
                     }
                 }
+                detailsCounter--
             }
         }
-        getPokeApiService().getPokemonDetails(name).enqueue(wsServiceCallback)
     }
 
-    fun loadMoves(context: Context) {
-        val wsServiceCallback : Callback<PokemonDetailsModel> = object :
-            Callback<PokemonDetailsModel> {
+    /**
+     * Load moves in the API, and store them when the callback is called
+     */
+    fun loadCallBackMoves(context: Context) : Callback<PokemonDetailsModel> {
+        return object : Callback<PokemonDetailsModel> {
             override fun onFailure(call: Call<PokemonDetailsModel>, t: Throwable) {
-                Log.w("PokeApi", "Cannot load statistics of the $name pokemon")
+                Log.w("PokeApi", "Cannot load moves of the $name pokemon")
             }
 
             override fun onResponse(call: Call<PokemonDetailsModel>, response: Response<PokemonDetailsModel>) {
                 Log.w("Response: ", response.code().toString())
                 if (response.code() == 200) {
                     response.body()?.let {
-                        it.moves.forEach { moveObject -> loadMove(moveObject.move.name, context) }
-
-                        // Sort it in place in alphabetical order
-                        moves.sortBy { move ->
-                            move.name
+                        it.moves.forEach { moveObject ->
+                            movesCounter++
+                            loadMove(moveObject.move.name, context)
                         }
                     }
                 }
             }
         }
-        getPokeApiService().getPokemonDetails(name).enqueue(wsServiceCallback)
     }
 
     /**
@@ -103,23 +107,25 @@ data class SimplifiedPokemonDetails(
      */
     private fun loadMove(name : String, context: Context) {
 
-        val wsCallback : Callback<MoveModel> = object : Callback<MoveModel> {
-            override fun onFailure(call: Call<MoveModel>, t: Throwable) {
-                Toast.makeText(context, "Cannot load the move $name", Toast.LENGTH_LONG).show()
-                Log.w("MoveError", t)
-            }
+        getPokeAPIService().getMoveDetails(name).enqueue(
+            object : Callback<MoveModel> {
+                override fun onFailure(call: Call<MoveModel>, t: Throwable) {
+                    Toast.makeText(context, "Failed to load $name", Toast.LENGTH_LONG).show()
+                    Log.w("MoveError", t)
+                    movesCounter--
+                }
 
-            override fun onResponse(call: Call<MoveModel>, response: Response<MoveModel>) {
-                if (response.code() == 200) {
-                    response.body()?.let {
-                        if (it.power > 0) {
-                            moves.add(it)
+                override fun onResponse(call: Call<MoveModel>, response: Response<MoveModel>) {
+                    if (response.code() == 200) {
+                        response.body()?.let {
+                            if (it.power > 0) {
+                                moves.add(it)
+                            }
                         }
                     }
+                    movesCounter--
                 }
             }
-        }
-
-        getPokeApiService().getMoveDetails(name).enqueue(wsCallback)
+        )
     }
 }

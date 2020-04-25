@@ -25,33 +25,18 @@ class SplashScreenFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Disabled them if pokemons are not loaded
         if ((activity as MainActivity).data == null) {
             btn_battle.isEnabled = false
             btn_pokedex.isEnabled = false
         }
 
         btn_battle.setOnClickListener {
-            (activity as SplashScreenButtonClicked).onBattleClicked()
+            (activity as MainActivity).onBattleButtonClicked()
         }
 
         btn_pokedex.setOnClickListener {
-            (activity as SplashScreenButtonClicked).onPokedexClicked()
+            (activity as MainActivity).onPokedexButtonClicked()
         }
-    }
-
-    /**
-     * Interface that hold buttons redirection functions.
-     */
-    interface SplashScreenButtonClicked {
-
-        /**
-         * Redirect to the Battle Lobby fragment.
-         */
-        fun onBattleClicked()
-
-        /**
-         * Redirect to the pokedex list fragment.
-         */
-        fun onPokedexClicked()
     }
 }
