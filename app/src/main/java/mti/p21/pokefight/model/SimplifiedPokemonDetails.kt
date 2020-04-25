@@ -33,10 +33,12 @@ class SimplifiedPokemonDetails(
     var detailsCounter: Int = 0
     var movesCounter: Int = 0
 
+    val pokeApiInterface: PokeApiInterface = getPokeAPIService()
+
     /**
      * Get the pokeApiService to make request to it.
      */
-    fun getPokeAPIService() : PokeApiInterface {
+    private fun getPokeAPIService() : PokeApiInterface {
         val baseURL = "https://pokeapi.co/api/v2/"
         val jsonConverter = GsonConverterFactory.create(GsonBuilder().create())
         val retrofit = Retrofit.Builder()
@@ -107,7 +109,7 @@ class SimplifiedPokemonDetails(
      */
     private fun loadMove(name : String, context: Context) {
 
-        getPokeAPIService().getMoveDetails(name).enqueue(
+        pokeApiInterface.getMoveDetails(name).enqueue(
             object : Callback<MoveModel> {
                 override fun onFailure(call: Call<MoveModel>, t: Throwable) {
                     Toast.makeText(context, "Failed to load $name", Toast.LENGTH_LONG).show()

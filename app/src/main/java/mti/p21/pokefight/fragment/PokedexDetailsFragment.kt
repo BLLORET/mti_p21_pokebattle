@@ -40,7 +40,7 @@ class PokedexDetailsFragment : Fragment() {
     private fun loadPokemonDetails(pokemon: SimplifiedPokemonDetails) {
 
         pokemon.detailsCounter++
-        pokemon.getPokeAPIService().getPokemonDetails(pokemon.name).enqueue(
+        pokemon.pokeApiInterface.getPokemonDetails(pokemon.name).enqueue(
             pokemon.loadCallBackPokemonDetails(activity!!)
         )
 

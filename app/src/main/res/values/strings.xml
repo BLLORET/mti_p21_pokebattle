@@ -25,17 +25,19 @@
         Good Luck!</string>
     <string name="label_first_opponent">Your first opponent will be…</string>
     <string name="label_from">From</string>
-    <string name="label_pokebattle">PokeBattle</string>
-    <string name="label_pokedex">PokeDex</string>
-    <string name="label_no_pokemon">\?</string>
+    <string name="label_lost">You have lost the battle…</string>
     <string name="label_made_at">Made at</string>
     <string name="label_made_by">An application made by:</string>
     <string name="label_multiplier_0">x0</string>
     <string name="label_multiplier_05">x0.5</string>
     <string name="label_multiplier_2">x2</string>
+    <string name="label_no_pokemon">\?</string>
+    <string name="label_pokebattle">PokeBattle</string>
+    <string name="label_pokedex">PokeDex</string>
     <string name="label_select_pokemon">Please select your Pokemons for the battle to come.</string>
     <string name="label_to">To</string>
     <string name="label_vs">VS.</string>
+    <string name="label_won">You have won the battle !!!</string>
 
     <string name="picture_description_epita">Picture of the Epita logo.</string>
     <string name="picture_description_background">Picture that represent a background.</string>
