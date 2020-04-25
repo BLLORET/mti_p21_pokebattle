@@ -7,5 +7,6 @@ data class MoveModel (
     val name: String,
     val power: Int,
     val damage_class: DataName,
-    val type: PokeType
+    val type: PokeType,
+    val accuracy: Int
 )

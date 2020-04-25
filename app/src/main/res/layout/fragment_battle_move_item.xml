@@ -19,12 +19,14 @@
         android:id="@+id/itemBattleMovePower_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
         android:text="@string/label_default_power"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/itemBattleMoveCategoryAttack"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.483" />
+        app:layout_constraintEnd_toEndOf="@+id/itemBattleMovePuissance"
+        app:layout_constraintStart_toStartOf="@+id/itemBattleMovePuissance"
+        app:layout_constraintTop_toBottomOf="@+id/itemBattleMovePuissance"
+        app:layout_constraintVertical_bias="1.0" />
 
     <ImageView
         android:id="@+id/itemBattleMoveType_imageView"
@@ -47,4 +49,34 @@
         app:layout_constraintEnd_toStartOf="@+id/itemBattleMoveType_imageView"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/bug" />
+
+    <TextView
+        android:id="@+id/itemBattleMovePuissance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="32dp"
+        android:text="@string/label_battle_power"
+        app:layout_constraintEnd_toStartOf="@+id/itemBattleMovePrecision"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/itemBattleMovePrecision"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="24dp"
+        android:text="@string/label_battle_precision"
+        app:layout_constraintEnd_toStartOf="@+id/itemBattleMoveCategoryAttack"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/itembattleMovePrecision_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_default_precision"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/itemBattleMovePrecision"
+        app:layout_constraintStart_toStartOf="@+id/itemBattleMovePrecision"
+        app:layout_constraintTop_toBottomOf="@+id/itemBattleMovePrecision" />
 </androidx.constraintlayout.widget.ConstraintLayout>

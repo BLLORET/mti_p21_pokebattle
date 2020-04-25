@@ -51,7 +51,9 @@
     <string name="stats_types">Types:</string>
     <string name="stats_weight">Weight: </string>
     <string name="stats_height">Height:</string>
-
+    <string name="label_battle_power">Power</string>
+    <string name="label_battle_precision">Precision</string>
+    <string name="label_default_precision">0</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

@@ -2,6 +2,7 @@ package mti.p21.pokefight.adapter
 
 import android.content.Context
 import android.content.res.Resources
+import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,7 @@ class BattleMovesAdapter(
         val movePowerTextView : TextView = itemView.findViewById(R.id.itemBattleMovePower_textView)
         val moveTypeImageView : ImageView = itemView.findViewById(R.id.itemBattleMoveType_imageView)
         val moveCategoryImageView : ImageView = itemView.findViewById(R.id.itemBattleMoveCategoryAttack)
+        val movePrecisionTextView: TextView = itemView.findViewById(R.id.itemBattleMovePrecision)
     }
 
     /**
@@ -63,7 +65,7 @@ class BattleMovesAdapter(
         holder.moveNameTextView.text = move.name
         holder.movePowerTextView.text = move.power.toString()
         holder.moveTypeImageView.setImageResource(move.type.getPictureID(resources, context))
-
+        holder.movePrecisionTextView.text = move.accuracy.toString()
         holder.moveCategoryImageView.setImageResource(if (move.damage_class.name == "physical") {
                 R.drawable.physical
         } else {
