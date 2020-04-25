@@ -22,8 +22,9 @@
         android:layout_marginEnd="32dp"
         android:text="@string/label_default_power"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/itemBattleMoveType_imageView"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/itemBattleMoveCategoryAttack"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.483" />
 
     <ImageView
         android:id="@+id/itemBattleMoveType_imageView"
@@ -33,6 +34,17 @@
         android:contentDescription="@string/picture_description_type"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/bug" />
+
+    <ImageView
+        android:id="@+id/itemBattleMoveCategoryAttack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/picture_description_type"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemBattleMoveType_imageView"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/bug" />
 </androidx.constraintlayout.widget.ConstraintLayout>

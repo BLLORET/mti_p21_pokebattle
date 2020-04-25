@@ -22,6 +22,7 @@ class BattleMovesAdapter(
         val moveNameTextView : TextView = itemView.findViewById(R.id.itemBattleMoveName_textView)
         val movePowerTextView : TextView = itemView.findViewById(R.id.itemBattleMovePower_textView)
         val moveTypeImageView : ImageView = itemView.findViewById(R.id.itemBattleMoveType_imageView)
+        val moveCategoryImageView : ImageView = itemView.findViewById(R.id.itemBattleMoveCategoryAttack)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -45,5 +46,11 @@ class BattleMovesAdapter(
         holder.moveNameTextView.text = move.name
         holder.movePowerTextView.text = move.power.toString()
         holder.moveTypeImageView.setImageResource(move.type.getPictureID(resources, context))
+
+        holder.moveCategoryImageView.setImageResource(if (move.damage_class.name == "physical") {
+                R.drawable.physical
+        } else {
+                R.drawable.special
+        })
     }
 }
