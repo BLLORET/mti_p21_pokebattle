@@ -48,8 +48,8 @@ class GameManager (
             loadCurrentPokemonInformations()
             loadOpponentPokemonInformations()
 
-            fragment.findViewById<Button>(R.id.btn_battle_pokemon).isEnabled = true
-            fragment.findViewById<Button>(R.id.btn_battle_attack).isEnabled = true
+            fragment.findViewById<Button>(R.id.btn_battle_pokemon)?.isEnabled = true
+            fragment.findViewById<Button>(R.id.btn_battle_attack)?.isEnabled = true
         }
     }
 
@@ -147,12 +147,16 @@ class GameManager (
     /**
      * Determine if a pokemon is dead or alive, display information if he is dead
      */
-    private fun checkPokemonIsDead(pokemon: SimplifiedPokemonDetails) : Boolean {
+    private fun checkPokemonIsDead(
+        pokemon: SimplifiedPokemonDetails,
+        idPokemonImage: Int
+    ) : Boolean {
         if (pokemon.hp != 0) {
             return false
         }
         val infoDead = "${pokemon.name} is dead."
-        fragment.findViewById<TextView>(R.id.informations_textView).text = infoDead
+        fragment.findViewById<TextView>(R.id.informations_textView)?.text = infoDead
+        fragment.findViewById<ImageView>(idPokemonImage)?.setImageResource(0)
 
         return true
     }
@@ -163,7 +167,7 @@ class GameManager (
     private suspend fun battleOver(win: Boolean) {
         val infoText = if (win) fragment.getString(R.string.label_won)
                        else fragment.getString(R.string.label_lost)
-        fragment.findViewById<TextView>(R.id.informations_textView).text = infoText
+        fragment.findViewById<TextView>(R.id.informations_textView)?.text = infoText
         delay(delayTime * 4)
         (fragment as MainActivity).supportFragmentManager.popBackStack()
     }
@@ -178,9 +182,8 @@ class GameManager (
             actionTurn(chosenMove)
             delay(delayTime)
 
-            if (checkPokemonIsDead(currentPokemon)) {
+            if (checkPokemonIsDead(currentPokemon, R.id.currentPokemon_imageView)) {
                 // Make the pokemon image empty
-                fragment.findViewById<ImageView>(R.id.currentPokemon_imageView).setImageResource(0)
                 delay(delayTime)
                 if (!gameIsFinished()) {
 
@@ -189,7 +192,7 @@ class GameManager (
                     battleOver(false)
                 }
             }
-            else if (checkPokemonIsDead(currentOpponent)) {
+            else if (checkPokemonIsDead(currentOpponent, R.id.opponentPokemon_imageView)) {
                 delay(delayTime)
                 if (!gameIsFinished()) {
                     setNextOpponent()
@@ -201,9 +204,9 @@ class GameManager (
 
             // Enables button when the turn is finished and set the information view
             val infoText = fragment.getString(R.string.interaction_select_action)
-            fragment.findViewById<TextView>(R.id.informations_textView).text = infoText
-            fragment.findViewById<Button>(R.id.btn_battle_attack).isEnabled = true
-            fragment.findViewById<Button>(R.id.btn_battle_pokemon).isEnabled = true
+            fragment.findViewById<TextView>(R.id.informations_textView)?.text = infoText
+            fragment.findViewById<Button>(R.id.btn_battle_attack)?.isEnabled = true
+            fragment.findViewById<Button>(R.id.btn_battle_pokemon)?.isEnabled = true
         }
     }
 
@@ -283,8 +286,18 @@ class GameManager (
         // If move is null because it an IA, we find it's move
         val currentMove = move ?: getBetterIAMove(pokemonAttacker, pokemonDefender)
 
-        val infoMove = "${pokemonAttacker.name} use ${currentMove.name}"
-        fragment.findViewById<TextView>(R.id.informations_textView).text = infoMove
+        var infoMove = "${pokemonAttacker.name} use ${currentMove.name}"
+        val infoTextView: TextView? = fragment.findViewById(R.id.informations_textView)
+
+        // Check if the move failed
+        val randomNumber = (0..100).shuffled().first()
+        if (randomNumber > currentMove.accuracy) {
+            infoMove = "${pokemonAttacker.name} failed its move ${currentMove.name}"
+            infoTextView?.text = infoMove
+            return
+        }
+
+        infoTextView?.text = infoMove
 
         val damages: Int = getDamagesOfMove(
             pokemonAttacker = pokemonAttacker,
@@ -344,19 +357,23 @@ class GameManager (
         idPokemonType1Image: Int,
         idPokemonType2Image: Int
     ) {
-        fragment.findViewById<TextView>(idPokemonName).text = pokemon.name
-        fragment.findViewById<TextView>(idPokemonHP).text = pokemon.hp.toString()
+        fragment.findViewById<TextView>(idPokemonName)?.text = pokemon.name
+        fragment.findViewById<TextView>(idPokemonHP)?.text = pokemon.hp.toString()
 
-        Glide
-            .with(fragment)
-            .load(pokemon.sprite)
-            .into(fragment.findViewById(idPokemonImage))
+        val pokemonImageView: ImageView? = fragment.findViewById(idPokemonImage)
 
-        val pokemonType1ImageView: ImageView = fragment.findViewById(idPokemonType1Image)
-        pokemonType1ImageView.setImageResource(pokemon.types[0].getPictureID(resources, fragment))
+        if (pokemonImageView != null) {
+            Glide
+                .with(fragment)
+                .load(pokemon.sprite)
+                .into(pokemonImageView)
+        }
 
-        val pokemonType2ImageView: ImageView = fragment.findViewById(idPokemonType2Image)
-        pokemonType2ImageView.setImageResource(
+        val pokemonType1ImageView: ImageView? = fragment.findViewById(idPokemonType1Image)
+        pokemonType1ImageView?.setImageResource(pokemon.types[0].getPictureID(resources, fragment))
+
+        val pokemonType2ImageView: ImageView? = fragment.findViewById(idPokemonType2Image)
+        pokemonType2ImageView?.setImageResource(
             if (pokemon.types.size > 1) pokemon.types[1].getPictureID(resources, fragment)
             else 0
         )

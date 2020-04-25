@@ -24,7 +24,7 @@ class LobbyFragment : Fragment() {
 
     private lateinit var pokemons: List<PokemonModel>
     private lateinit var pokemonsOpponents: List<PokemonModel>
-    private var team: MutableList<PokemonModel?> = MutableList(3) { null }
+    private lateinit var team: MutableList<PokemonModel?>
     private var selectedPokemon: PokemonModel? = null
 
     override fun onCreateView(
@@ -37,6 +37,11 @@ class LobbyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Reset after a battle
+        selectedPokemon = null
+        btn_fight.visibility = View.INVISIBLE
+        team = MutableList(3) { null }
 
         // Get the list au pokemon sorted by type1 then type2 if it exists
         pokemons = (activity as MainActivity).data!!.sortedBy { pokemon ->
