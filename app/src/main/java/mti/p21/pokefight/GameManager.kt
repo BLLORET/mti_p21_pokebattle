@@ -1,16 +1,20 @@
 package mti.p21.pokefight
 
 import android.content.res.Resources
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mti.p21.pokefight.model.*
+import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.Serializable
@@ -211,16 +215,11 @@ class GameManager (
     }
 
     /**
-     * Load damages relation from a pokeType, BE CAREFUL! THIS IS SYNCHRONOUS!!!!
+     * Load damages relation from a pokeType
      */
-    private fun loadDamageRelations(pokeTypeName: String) : DamageRelations {
-        // Make it synchronous
-        lateinit var request : Response<TypeModel>
-        do {
-            request = currentPokemon.pokeApiInterface.getDamageRelations(pokeTypeName).execute()
-        } while (!request.isSuccessful || request.code() != 200)
-
-        return request.body()!!.damage_relations
+    private fun loadDamageRelations(pokeTypeName: String) : DamageRelations? {
+            return currentPokemon.pokeApiInterface.getDamageRelations(pokeTypeName)
+                                                             .execute().body()?.damage_relations
     }
 
     /**
@@ -231,13 +230,14 @@ class GameManager (
         pokemonDefender: SimplifiedPokemonDetails,
         move: MoveModel
     ): Int {
-        val damageRelations = pokemonAttacker.temporary//loadDamageRelations(move.type.name)
+
+        val damageRelations: DamageRelations? = loadDamageRelations(move.type.name)
 
         var damages: Int = calculateDamage(
             pokemonAttacker = pokemonAttacker,
             pokemonDefender = pokemonDefender,
             move = move,
-            damageRelations = damageRelations,
+            damageRelations = damageRelations!!,
             defenderType = pokemonDefender.types[0].name
         )
 
@@ -248,7 +248,7 @@ class GameManager (
                     pokemonAttacker = pokemonAttacker,
                     pokemonDefender = pokemonDefender,
                     move = move,
-                    damageRelations = damageRelations,
+                    damageRelations = damageRelations!!,
                     defenderType = pokemonDefender.types[1].name
                 )
             )
