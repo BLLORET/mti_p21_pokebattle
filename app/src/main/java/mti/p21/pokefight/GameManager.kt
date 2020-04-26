@@ -1,46 +1,46 @@
 package mti.p21.pokefight
 
 import android.content.res.Resources
-import android.util.Log
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
-import kotlinx.coroutines.async
+import kotlinx.android.synthetic.main.fragment_battle.*
+import kotlinx.android.synthetic.main.fragment_battle_interaction.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import mti.p21.pokefight.model.*
-import retrofit2.Call
+import mti.p21.pokefight.model.DamageRelations
+import mti.p21.pokefight.model.MoveModel
+import mti.p21.pokefight.model.PokemonDetailsModel
+import mti.p21.pokefight.model.SimplifiedPokemonDetails
+import mti.p21.pokefight.utils.AbstractActivity
+import mti.p21.pokefight.webServiceInterface.PokeApiInterface
 import retrofit2.Callback
-import retrofit2.Response
 import java.io.Serializable
 import kotlin.math.max
 
 class GameManager (
+    private val mainActivity: AbstractActivity,
     val team: List<SimplifiedPokemonDetails>,
     private val opponentTeam: List<SimplifiedPokemonDetails>,
-    private val fragment: FragmentActivity,
     private val resources: Resources
 ) : Serializable, ViewModel() {
 
-    var currentPokemonIndex: Int = 0
-    private var currentOpponentIndex: Int = 0
-    private val delayTime: Long = 2000L
+    var currentPokemonIndex = 0
+    private var currentOpponentIndex = 0
+    private val delayTime = 2000L
 
     init {
         team.forEach { pokemon ->
             pokemon.detailsCounter++
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackPokemonDetails(fragment))
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackMoves(fragment))
+            loadOnPokemonAPI(pokemon, pokemon.loadCallBackPokemonDetails(mainActivity))
+            loadOnPokemonAPI(pokemon, pokemon.loadCallBackMoves(mainActivity))
         }
         opponentTeam.forEach { pokemon ->
             pokemon.detailsCounter++
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackPokemonDetails(fragment))
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackMoves(fragment))
+            loadOnPokemonAPI(pokemon, pokemon.loadCallBackPokemonDetails(mainActivity))
+            loadOnPokemonAPI(pokemon, pokemon.loadCallBackMoves(mainActivity))
         }
 
         // Coroutine wait for loading
@@ -49,11 +49,11 @@ class GameManager (
                    !opponentTeam.all { it.detailsCounter == 0 && it.movesCounter == 0}) {
                 delay(500)
             }
-            loadCurrentPokemonInformations()
-            loadOpponentPokemonInformations()
+            loadCurrentPokemonInformation()
+            loadOpponentPokemonInformation()
 
-            fragment.findViewById<Button>(R.id.btn_battle_pokemon)?.isEnabled = true
-            fragment.findViewById<Button>(R.id.btn_battle_attack)?.isEnabled = true
+            mainActivity.btn_battle_pokemon?.isEnabled = true
+            mainActivity.btn_battle_attack?.isEnabled = true
         }
     }
 
@@ -71,7 +71,7 @@ class GameManager (
         pokemon: SimplifiedPokemonDetails,
         loadFunction: Callback<PokemonDetailsModel>
     ) {
-        pokemon.pokeApiInterface.getPokemonDetails(pokemon.name).enqueue(
+        mainActivity.service<PokeApiInterface>().getPokemonDetails(pokemon.name).enqueue(
             loadFunction
         )
     }
@@ -113,7 +113,7 @@ class GameManager (
             pokemonAttacker = currentPokemon,
             pokemonDefender = currentOpponent,
             move = chosenMove) {
-            loadOpponentPokemonInformations()
+            loadOpponentPokemonInformation()
         }
     }
 
@@ -125,7 +125,7 @@ class GameManager (
             pokemonAttacker = currentOpponent,
             pokemonDefender = currentPokemon,
             move = null) {
-            loadCurrentPokemonInformations()
+            loadCurrentPokemonInformation()
         }
     }
 
@@ -136,15 +136,13 @@ class GameManager (
         if (currentPokemon.speed >= currentOpponent.speed) {
             currentPokemonAttackTurn(chosenMove)
             delay(delayTime)
-            if (currentOpponent.hp > 0) {
+            if (currentOpponent.hp > 0)
                 currentOpponentAttackTurn()
-            }
         } else {
             currentOpponentAttackTurn()
             delay(delayTime)
-            if (currentPokemon.hp > 0) {
+            if (currentPokemon.hp > 0)
                 currentPokemonAttackTurn(chosenMove)
-            }
         }
     }
 
@@ -159,8 +157,8 @@ class GameManager (
             return false
         }
         val infoDead = "${pokemon.name} is dead."
-        fragment.findViewById<TextView>(R.id.informations_textView)?.text = infoDead
-        fragment.findViewById<ImageView>(idPokemonImage)?.setImageResource(0)
+        mainActivity.informations_textView?.text = infoDead
+        mainActivity.findViewById<ImageView>(idPokemonImage)?.setImageResource(0)
 
         return true
     }
@@ -169,17 +167,18 @@ class GameManager (
      * Make the battle over and display a message to explain the player have lost or won.
      */
     private suspend fun battleOver(win: Boolean) {
-        val infoText = if (win) fragment.getString(R.string.label_won)
-                       else fragment.getString(R.string.label_lost)
-        fragment.findViewById<TextView>(R.id.informations_textView)?.text = infoText
+        val infoText = if (win) mainActivity.getString(R.string.label_won)
+                       else mainActivity.getString(R.string.label_lost)
+        mainActivity.informations_textView?.text = infoText
+        //TODO change this
         delay(delayTime * 4)
-        (fragment as MainActivity).supportFragmentManager.popBackStack()
+        mainActivity.backActivity()
     }
 
     /**
      * Represent the turn of battle
      */
-    fun battleTurn(chosenMove: MoveModel, fragment: FragmentActivity) {
+    fun battleTurn(chosenMove: MoveModel) {
 
         viewModelScope.launch {
 
@@ -190,8 +189,7 @@ class GameManager (
                 // Make the pokemon image empty
                 delay(delayTime)
                 if (!gameIsFinished()) {
-
-                    (fragment as MainActivity).onPokemonButtonClicked(this@GameManager)
+                    mainActivity.onPokemonButtonClicked(this@GameManager)
                 } else {
                     battleOver(false)
                 }
@@ -200,17 +198,17 @@ class GameManager (
                 delay(delayTime)
                 if (!gameIsFinished()) {
                     setNextOpponent()
-                    loadOpponentPokemonInformations()
+                    loadOpponentPokemonInformation()
                 } else {
                     battleOver(true)
                 }
             }
 
             // Enables button when the turn is finished and set the information view
-            val infoText = fragment.getString(R.string.interaction_select_action)
-            fragment.findViewById<TextView>(R.id.informations_textView)?.text = infoText
-            fragment.findViewById<Button>(R.id.btn_battle_attack)?.isEnabled = true
-            fragment.findViewById<Button>(R.id.btn_battle_pokemon)?.isEnabled = true
+            val infoText = mainActivity.getString(R.string.interaction_select_action)
+            mainActivity.informations_textView?.text = infoText
+            mainActivity.btn_battle_attack?.isEnabled = true
+            mainActivity.btn_battle_pokemon?.isEnabled = true
         }
     }
 
@@ -218,8 +216,10 @@ class GameManager (
      * Load damages relation from a pokeType
      */
     private fun loadDamageRelations(pokeTypeName: String) : DamageRelations? {
-            return currentPokemon.pokeApiInterface.getDamageRelations(pokeTypeName)
-                                                             .execute().body()?.damage_relations
+        //TODO change this
+            return mainActivity.service<PokeApiInterface>()
+                .getDamageRelations(pokeTypeName)
+                .execute().body()?.damage_relations
     }
 
     /**
@@ -230,7 +230,6 @@ class GameManager (
         pokemonDefender: SimplifiedPokemonDetails,
         move: MoveModel
     ): Int {
-
         val damageRelations: DamageRelations? = loadDamageRelations(move.type.name)
 
         var damages: Int = calculateDamage(
@@ -248,7 +247,7 @@ class GameManager (
                     pokemonAttacker = pokemonAttacker,
                     pokemonDefender = pokemonDefender,
                     move = move,
-                    damageRelations = damageRelations!!,
+                    damageRelations = damageRelations,
                     defenderType = pokemonDefender.types[1].name
                 )
             )
@@ -264,14 +263,13 @@ class GameManager (
         pokemonAttacker: SimplifiedPokemonDetails,
         pokemonDefender: SimplifiedPokemonDetails
     ) : MoveModel {
-
-        return pokemonAttacker.moves.toList().sortedByDescending {move ->
+        return pokemonAttacker.moves.toList().maxBy { move ->
             getDamagesOfMove(
                 pokemonAttacker,
                 pokemonDefender,
                 move
             )
-        }[0]
+        }!!
     }
 
     /**
@@ -287,7 +285,7 @@ class GameManager (
         val currentMove = move ?: getBetterIAMove(pokemonAttacker, pokemonDefender)
 
         var infoMove = "${pokemonAttacker.name} use ${currentMove.name}"
-        val infoTextView: TextView? = fragment.findViewById(R.id.informations_textView)
+        val infoTextView: TextView? = mainActivity.informations_textView
 
         // Check if the move failed
         val randomNumber = (0..100).shuffled().first()
@@ -299,11 +297,7 @@ class GameManager (
 
         infoTextView?.text = infoMove
 
-        val damages: Int = getDamagesOfMove(
-            pokemonAttacker = pokemonAttacker,
-            pokemonDefender = pokemonDefender,
-            move = currentMove
-        )
+        val damages: Int = getDamagesOfMove(pokemonAttacker, pokemonDefender, currentMove)
 
         // Protect hp to become negative
         pokemonDefender.hp = max(0, pokemonDefender.hp - damages)
@@ -335,11 +329,17 @@ class GameManager (
         val defTypeModifier = getDefenderTypeModifier(damageRelations, defenderType)
         val physicalDamage : Boolean = move.damage_class.name == "physical"
 
-        val attackModifier: Float = if (physicalDamage) pokemonAttacker.attack.toFloat()
-                                    else pokemonAttacker.attackSpe.toFloat()
+        val attackModifier: Float =
+            if (physicalDamage)
+                pokemonAttacker.attack.toFloat()
+            else
+                pokemonAttacker.attackSpe.toFloat()
 
-        val defenseModifier: Float = if (physicalDamage) pokemonDefender.defense.toFloat()
-                                     else pokemonDefender.defenseSpe.toFloat()
+        val defenseModifier: Float =
+            if (physicalDamage)
+                pokemonDefender.defense.toFloat()
+            else
+                pokemonDefender.defenseSpe.toFloat()
 
 
         return ((attackModifier / 10F + move.power - defenseModifier) * defTypeModifier).toInt()
@@ -347,7 +347,7 @@ class GameManager (
 
 
     /**
-     * Load informations of the selected pokemon with correct ids
+     * Load information of the selected pokemon with correct ids
      */
     private fun loadPokemonInformation(
         pokemon: SimplifiedPokemonDetails,
@@ -357,32 +357,34 @@ class GameManager (
         idPokemonType1Image: Int,
         idPokemonType2Image: Int
     ) {
-        fragment.findViewById<TextView>(idPokemonName)?.text = pokemon.name
-        fragment.findViewById<TextView>(idPokemonHP)?.text = pokemon.hp.toString()
+        mainActivity.findViewById<TextView>(idPokemonName)?.text = pokemon.name
+        mainActivity.findViewById<TextView>(idPokemonHP)?.text = pokemon.hp.toString()
 
-        val pokemonImageView: ImageView? = fragment.findViewById(idPokemonImage)
+        val pokemonImageView: ImageView? = mainActivity.findViewById(idPokemonImage)
 
         if (pokemonImageView != null) {
             Glide
-                .with(fragment)
+                .with(mainActivity)
                 .load(pokemon.sprite)
                 .into(pokemonImageView)
         }
 
-        val pokemonType1ImageView: ImageView? = fragment.findViewById(idPokemonType1Image)
-        pokemonType1ImageView?.setImageResource(pokemon.types[0].getPictureID(resources, fragment))
+        val pokemonType1ImageView: ImageView? = mainActivity.findViewById(idPokemonType1Image)
+        pokemonType1ImageView?.setImageResource(pokemon.types[0].getPictureID(resources, mainActivity))
 
-        val pokemonType2ImageView: ImageView? = fragment.findViewById(idPokemonType2Image)
+        val pokemonType2ImageView: ImageView? = mainActivity.findViewById(idPokemonType2Image)
         pokemonType2ImageView?.setImageResource(
-            if (pokemon.types.size > 1) pokemon.types[1].getPictureID(resources, fragment)
-            else 0
+            if (pokemon.types.size > 1)
+                pokemon.types[1].getPictureID(resources, mainActivity)
+            else
+                0
         )
     }
 
     /**
      * Load information about the current selected pokemon,
      */
-    fun loadCurrentPokemonInformations() {
+    fun loadCurrentPokemonInformation() {
         loadPokemonInformation(
             pokemon = currentPokemon,
             idPokemonHP = R.id.currentPokemonHP_textView,
@@ -394,9 +396,9 @@ class GameManager (
     }
 
     /**
-     * Load informations about the current opponent
+     * Load information about the current opponent
      */
-    private fun loadOpponentPokemonInformations() {
+    private fun loadOpponentPokemonInformation() {
         loadPokemonInformation(
             pokemon = currentOpponent,
             idPokemonHP = R.id.opponentPokemonHP_textView,
