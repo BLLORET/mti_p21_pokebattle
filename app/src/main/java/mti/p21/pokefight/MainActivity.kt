@@ -1,115 +1,71 @@
 package mti.p21.pokefight
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.google.gson.GsonBuilder
-import kotlinx.android.synthetic.main.fragment_splash_screen.*
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import mti.p21.pokefight.fragment.*
 import mti.p21.pokefight.model.PokeType
 import mti.p21.pokefight.model.PokemonModel
 import mti.p21.pokefight.model.SimplifiedPokemonDetails
+import mti.p21.pokefight.utils.AbstractActivity
+import mti.p21.pokefight.utils.ExceptionDuringSuccess
+import mti.p21.pokefight.utils.call
 import mti.p21.pokefight.webServiceInterface.PokemonModelInterface
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class MainActivity : AppCompatActivity(), FragmentInteractionsInterface, BattleInteractionsInterface {
+class MainActivity : AbstractActivity() {
 
-    var data: List<PokemonModel>? = null
+    override val layoutResource = R.layout.activity_main
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override lateinit var listPokemon: MutableLiveData<List<PokemonModel>?>
+    override fun executeWhenListPokemonIsLoaded(owner: LifecycleOwner,
+                                                lambda: (List<PokemonModel>) -> Unit) {
+        listPokemon.observe(owner, Observer { if (it != null) lambda(it) })
+    }
 
-        setContentView(R.layout.activity_main)
-
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.main_container, SplashScreenFragment())
-            .commit()
-
+    override fun onInit() {
+        setupRetrofitWithUrl("https://www.surleweb.xyz/api/")
+        listPokemon = MutableLiveData<List<PokemonModel>?>()
         loadPokemonModels()
+
+        replaceFragment<SplashScreenFragment>(false)
+        setupRetrofitWithUrl("https://pokeapi.co/api/v2/")
     }
 
     /**
-     * Load Pokemons on the internet and store it in [data]
+     * Load Pokemons on the internet and store it in [listPokemon]
      */
     private fun loadPokemonModels() {
-
-        val service = Retrofit.Builder()
-            .baseUrl("https://www.surleweb.xyz/api/")
-            .addConverterFactory(
-                GsonConverterFactory.create(
-                    GsonBuilder().create()
-                )
-            )
-            .build()
-            .create(PokemonModelInterface::class.java)
-
-        val wsCallback : Callback<List<PokemonModel>> = object: Callback<List<PokemonModel>> {
-            override fun onFailure(call: Call<List<PokemonModel>>, t: Throwable) {
-                Toast.makeText(this@MainActivity,
-                          "Failed to load pokemons, make sure you have internet",
-                               Toast.LENGTH_LONG).show()
-                Log.w("Pokemons", "Cannot load all pokemons in API: $t")
+        service<PokemonModelInterface>().getAllPokemons().call {
+            onSuccess = {
+                val pokemonModels = it.body()
+                    ?: throw ExceptionDuringSuccess("La liste de pokemon est vide!")
+                listPokemon.value = pokemonModels.sortedBy { p -> p.name }
             }
-
-            override fun onResponse(
-                call: Call<List<PokemonModel>>,
-                response: Response<List<PokemonModel>>
-            ) {
-                if (response.code() == 200) {
-                    response.body()?.let { pokemonModels ->
-                        data = pokemonModels.sortedBy {pokemon ->
-                            pokemon.name
-                        }
-                        btn_battle.isEnabled = true
-                        btn_pokedex.isEnabled = true
-                    }
-                }
+            onFailure = {
+                toastLong("Failed to load pokemons, make sure you have internet")
+                Log.w("Pokemons", "Cannot load all pokemons in API: $it")
+                showDefaultErrors = false
             }
+            onAnyErrorNoArg = { toastLong("Error while loading pokemons!") }
         }
-
-        service.getAllPokemons().enqueue(wsCallback)
     }
 
-    override fun onBattleButtonClicked() {
-        goToFragment(LobbyFragment())
-    }
-
-    override fun onPokedexButtonClicked() {
-        goToFragment(PokedexListFragment())
-    }
-
-    /**
-     * Intermediary function to switch the main fragment
-     */
-    private fun goToFragment(fragment: Fragment) {
-        supportFragmentManager
-            .beginTransaction()
-            .addToBackStack(null)
-            .replace(R.id.main_container, fragment)
-            .commit()
-    }
+    override fun onBattleButtonClicked() { replaceFragment<LobbyFragment>() }
+    override fun onPokedexButtonClicked() { replaceFragment<PokedexListFragment>() }
 
     override fun onTypePictureClicked(pokeType: PokeType) {
 
         val argumentsBundle = Bundle()
         argumentsBundle.putSerializable("PokeType", pokeType)
 
-        val helpScreenFragment = HelpScreenFragment()
+        val helpScreenFragment = HelpScreenFragment(this)
         helpScreenFragment.arguments = argumentsBundle
 
-        // Do not use goToFragment because it does not replace the fragment
-        supportFragmentManager
-            .beginTransaction()
-            .addToBackStack(null)
-            .add(R.id.main_container, helpScreenFragment)
-            .commit()
+        // Add and not replace!
+        addFragment(helpScreenFragment)
     }
 
     override fun onFightButtonClicked(team: List<PokemonModel>, opponents: List<PokemonModel>) {
@@ -126,7 +82,9 @@ class MainActivity : AppCompatActivity(), FragmentInteractionsInterface, BattleI
             SimplifiedPokemonDetails(opponents[2].name, opponents[2].sprite, opponents[2].types)
         )
 
-        goToFragment(BattleFragment(teamSimplifiedPokemonDetails, opponentSimplifiedPokemonDetails))
+        replaceFragment(
+            BattleFragment(this, teamSimplifiedPokemonDetails, opponentSimplifiedPokemonDetails)
+        )
     }
 
     override fun onPokedexRowClicked(pokemon: PokemonModel) {
@@ -135,10 +93,10 @@ class MainActivity : AppCompatActivity(), FragmentInteractionsInterface, BattleI
 
         argumentsBundle.putSerializable("SimplifiedPokemon", simplifiedPokemon)
 
-        val detailsPokemonFragment = PokedexDetailsFragment()
+        val detailsPokemonFragment = PokedexDetailsFragment(this)
         detailsPokemonFragment.arguments = argumentsBundle
 
-        goToFragment(detailsPokemonFragment)
+        replaceFragment(detailsPokemonFragment)
     }
 
     private fun changeInteractionZoneFragment(fragment: Fragment, gameManager: GameManager) {
@@ -154,14 +112,15 @@ class MainActivity : AppCompatActivity(), FragmentInteractionsInterface, BattleI
     }
 
     override fun chooseAction(gameManager: GameManager, enableButtons: Boolean) {
-        changeInteractionZoneFragment(BattleInteractionFragment(enableButtons), gameManager)
+        changeInteractionZoneFragment(
+            BattleInteractionFragment(this, enableButtons), gameManager)
     }
 
     override fun onAttackButtonClicked(gameManager: GameManager) {
-        changeInteractionZoneFragment(BattleMovesFragment(), gameManager)
+        changeInteractionZoneFragment(BattleMovesFragment(this), gameManager)
     }
 
     override fun onPokemonButtonClicked(gameManager: GameManager) {
-        changeInteractionZoneFragment(BattlePokemonsFragment(), gameManager)
+        changeInteractionZoneFragment(BattlePokemonsFragment(this), gameManager)
     }
 }
