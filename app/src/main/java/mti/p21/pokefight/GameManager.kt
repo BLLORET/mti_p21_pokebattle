@@ -1,10 +1,10 @@
 package mti.p21.pokefight
 
 import android.content.res.Resources
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_battle.*
 import kotlinx.android.synthetic.main.fragment_battle_interaction.*
@@ -12,11 +12,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mti.p21.pokefight.model.DamageRelations
 import mti.p21.pokefight.model.MoveModel
-import mti.p21.pokefight.model.PokemonDetailsModel
 import mti.p21.pokefight.model.SimplifiedPokemonDetails
 import mti.p21.pokefight.utils.AbstractActivity
+import mti.p21.pokefight.utils.CounterAction
+import mti.p21.pokefight.utils.ExceptionDuringSuccess
+import mti.p21.pokefight.utils.call
 import mti.p21.pokefight.webServiceInterface.PokeApiInterface
-import retrofit2.Callback
 import java.io.Serializable
 import kotlin.math.max
 
@@ -31,29 +32,24 @@ class GameManager (
     private var currentOpponentIndex = 0
     private val delayTime = 2000L
 
-    init {
-        team.forEach { pokemon ->
-            pokemon.detailsCounter++
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackPokemonDetails(mainActivity))
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackMoves(mainActivity))
-        }
-        opponentTeam.forEach { pokemon ->
-            pokemon.detailsCounter++
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackPokemonDetails(mainActivity))
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackMoves(mainActivity))
-        }
+    private val counterAction = CounterAction()
 
-        // Coroutine wait for loading
-        viewModelScope.launch {
-            while (!team.all { it.detailsCounter == 0 && it.movesCounter == 0 } ||
-                   !opponentTeam.all { it.detailsCounter == 0 && it.movesCounter == 0}) {
-                delay(500)
-            }
+    init {
+        counterAction.onCounterEnd = {
             loadCurrentPokemonInformation()
             loadOpponentPokemonInformation()
 
             mainActivity.btn_battle_pokemon?.isEnabled = true
             mainActivity.btn_battle_attack?.isEnabled = true
+        }
+
+        team.forEach { pokemon ->
+            counterAction.increment()
+            loadOnPokemonAPI(pokemon)
+        }
+        opponentTeam.forEach { pokemon ->
+            counterAction.increment()
+            loadOnPokemonAPI(pokemon)
         }
     }
 
@@ -67,13 +63,38 @@ class GameManager (
     /**
      * Use a Callback function on the pokemon API to a specif pokemon
      */
-    private fun loadOnPokemonAPI(
-        pokemon: SimplifiedPokemonDetails,
-        loadFunction: Callback<PokemonDetailsModel>
-    ) {
-        mainActivity.service<PokeApiInterface>().getPokemonDetails(pokemon.name).enqueue(
-            loadFunction
-        )
+    private fun loadOnPokemonAPI(pokemon: SimplifiedPokemonDetails) {
+        mainActivity.service<PokeApiInterface>().getPokemonDetails(pokemon.name).call {
+            onSuccess = {
+                val pokemonDetail = it.body()
+                    ?: throw ExceptionDuringSuccess("Body is null")
+                pokemon.loadDetails(pokemonDetail)
+                pokemonDetail.moves.forEach { moveObject ->
+                    counterAction.increment()
+                    mainActivity.service<PokeApiInterface>()
+                        .getMoveDetails(moveObject.move.name).call {
+                        onSuccess = {res ->
+                            val moveModel = res.body()
+                                ?: throw ExceptionDuringSuccess("Body is null")
+                            if (moveModel.power > 0)
+                                pokemon.moves.add(moveModel)
+                            counterAction.decrement()
+                        }
+                        onFailure = {
+                            mainActivity.toastLong("Failed to load ${moveObject.move.name}")
+                        }
+                        onAnyErrorNoArg = { counterAction.decrement() }
+                    }
+                }
+                counterAction.decrement()
+            }
+            onFailure = {
+                mainActivity.toastLong("Failed to load stats of ${pokemon.name}")
+                Log.w("PokeApi",
+                    "Cannot load statistics of the ${pokemon.name} pokemon: $it")
+            }
+            onAnyErrorNoArg = { counterAction.decrement() }
+        }
     }
 
     /**
@@ -100,7 +121,10 @@ class GameManager (
         pokemonDefender: SimplifiedPokemonDetails,
         loadPokemonInformationFunction: () -> Unit
     ) {
+        // TODO : il serait interessant de faire autrement qu'avec un delay ici
+        // Cette fonction n'est pas bloquante
         doDamages(pokemonAttacker, move, pokemonDefender)
+        //donc ce delay a interet à etre assez long!
         delay(delayTime)
         loadPokemonInformationFunction()
     }
@@ -167,10 +191,12 @@ class GameManager (
      * Make the battle over and display a message to explain the player have lost or won.
      */
     private suspend fun battleOver(win: Boolean) {
-        val infoText = if (win) mainActivity.getString(R.string.label_won)
-                       else mainActivity.getString(R.string.label_lost)
+        val infoText =
+            if (win)
+                mainActivity.getString(R.string.label_won)
+            else
+                mainActivity.getString(R.string.label_lost)
         mainActivity.informations_textView?.text = infoText
-        //TODO change this
         delay(delayTime * 4)
         mainActivity.backActivity()
     }
@@ -181,27 +207,24 @@ class GameManager (
     fun battleTurn(chosenMove: MoveModel) {
 
         viewModelScope.launch {
-
             actionTurn(chosenMove)
             delay(delayTime)
 
             if (checkPokemonIsDead(currentPokemon, R.id.currentPokemon_imageView)) {
                 // Make the pokemon image empty
                 delay(delayTime)
-                if (!gameIsFinished()) {
+                if (!gameIsFinished())
                     mainActivity.onPokemonButtonClicked(this@GameManager)
-                } else {
+                else
                     battleOver(false)
-                }
             }
             else if (checkPokemonIsDead(currentOpponent, R.id.opponentPokemon_imageView)) {
                 delay(delayTime)
                 if (!gameIsFinished()) {
                     setNextOpponent()
                     loadOpponentPokemonInformation()
-                } else {
+                } else
                     battleOver(true)
-                }
             }
 
             // Enables button when the turn is finished and set the information view
@@ -215,11 +238,15 @@ class GameManager (
     /**
      * Load damages relation from a pokeType
      */
-    private fun loadDamageRelations(pokeTypeName: String) : DamageRelations? {
-        //TODO change this
-            return mainActivity.service<PokeApiInterface>()
-                .getDamageRelations(pokeTypeName)
-                .execute().body()?.damage_relations
+    private fun loadDamageRelations(pokeTypeName: String) : LiveData<DamageRelations> {
+        val liveData = MutableLiveData<DamageRelations>()
+        mainActivity.service<PokeApiInterface>().getDamageRelations(pokeTypeName).call {
+            onSuccess = {
+                liveData.value = it.body()?.damage_relations
+                    ?: throw ExceptionDuringSuccess("Body is null!")
+            }
+        }
+        return liveData
     }
 
     /**
@@ -229,31 +256,33 @@ class GameManager (
         pokemonAttacker: SimplifiedPokemonDetails,
         pokemonDefender: SimplifiedPokemonDetails,
         move: MoveModel
-    ): Int {
-        val damageRelations: DamageRelations? = loadDamageRelations(move.type.name)
-
-        var damages: Int = calculateDamage(
-            pokemonAttacker = pokemonAttacker,
-            pokemonDefender = pokemonDefender,
-            move = move,
-            damageRelations = damageRelations!!,
-            defenderType = pokemonDefender.types[0].name
-        )
-
-        if (pokemonDefender.types.size > 1) {
-            damages = minOf(
-                damages,
-                calculateDamage(
-                    pokemonAttacker = pokemonAttacker,
-                    pokemonDefender = pokemonDefender,
-                    move = move,
-                    damageRelations = damageRelations,
-                    defenderType = pokemonDefender.types[1].name
-                )
+    ): LiveData<Int> {
+        val liveInt = MutableLiveData<Int>()
+        val liveDamageRelations = loadDamageRelations(move.type.name)
+        liveDamageRelations.observe(mainActivity, Observer {
+            var damages: Int = calculateDamage(
+                pokemonAttacker = pokemonAttacker,
+                pokemonDefender = pokemonDefender,
+                move = move,
+                damageRelations = it,
+                defenderType = pokemonDefender.types[0].name
             )
-        }
 
-        return damages
+            if (pokemonDefender.types.size > 1) {
+                damages = minOf(
+                    damages,
+                    calculateDamage(
+                        pokemonAttacker = pokemonAttacker,
+                        pokemonDefender = pokemonDefender,
+                        move = move,
+                        damageRelations = it,
+                        defenderType = pokemonDefender.types[1].name
+                    )
+                )
+            }
+            liveInt.value = damages
+        })
+        return liveInt
     }
 
     /**
@@ -262,14 +291,28 @@ class GameManager (
     private fun getBetterIAMove(
         pokemonAttacker: SimplifiedPokemonDetails,
         pokemonDefender: SimplifiedPokemonDetails
-    ) : MoveModel {
-        return pokemonAttacker.moves.toList().maxBy { move ->
-            getDamagesOfMove(
-                pokemonAttacker,
-                pokemonDefender,
-                move
-            )
-        }!!
+    ) : LiveData<MoveModel> {
+        val liveMove = MutableLiveData<MoveModel>()
+
+        val counter = CounterAction()
+
+        val models: List<Pair<MoveModel, LiveData<Int>>> = pokemonAttacker.moves.toList()
+            .map {move ->
+                counter.increment()
+                val liveInt =
+                    getDamagesOfMove(pokemonAttacker, pokemonDefender, move)
+
+                liveInt.observe(mainActivity, Observer {
+                    counter.decrement()
+                })
+                move to liveInt
+            }
+
+        counter.onCounterEnd = {
+            liveMove.value = models.maxBy { it.second.value ?: -1 }?.first
+        }
+
+        return liveMove
     }
 
     /**
@@ -281,26 +324,38 @@ class GameManager (
         move: MoveModel?,
         pokemonDefender: SimplifiedPokemonDetails
     ) {
-        // If move is null because it an IA, we find it's move
-        val currentMove = move ?: getBetterIAMove(pokemonAttacker, pokemonDefender)
+        fun doDamages(currentMove: MoveModel) {
+            var infoMove = "${pokemonAttacker.name} use ${currentMove.name}"
+            val infoTextView: TextView? = mainActivity.informations_textView
 
-        var infoMove = "${pokemonAttacker.name} use ${currentMove.name}"
-        val infoTextView: TextView? = mainActivity.informations_textView
+            // Check if the move failed
+            val randomNumber = (0..100).shuffled().first()
+            if (randomNumber > currentMove.accuracy) {
+                infoMove = "${pokemonAttacker.name} failed its move ${currentMove.name}"
+                infoTextView?.text = infoMove
+                return
+            }
 
-        // Check if the move failed
-        val randomNumber = (0..100).shuffled().first()
-        if (randomNumber > currentMove.accuracy) {
-            infoMove = "${pokemonAttacker.name} failed its move ${currentMove.name}"
             infoTextView?.text = infoMove
-            return
+
+            val damagesLive: LiveData<Int> =
+                getDamagesOfMove(pokemonAttacker, pokemonDefender, currentMove)
+
+            damagesLive.observe(mainActivity, Observer {
+                // Protect hp to become negative
+                pokemonDefender.hp = max(0, pokemonDefender.hp - it)
+            })
         }
 
-        infoTextView?.text = infoMove
-
-        val damages: Int = getDamagesOfMove(pokemonAttacker, pokemonDefender, currentMove)
-
-        // Protect hp to become negative
-        pokemonDefender.hp = max(0, pokemonDefender.hp - damages)
+        // If move is null because it an IA, we find it's move
+        if (move == null) {
+            val moveModel = getBetterIAMove(pokemonAttacker, pokemonDefender)
+            moveModel.observe(mainActivity, Observer {
+                doDamages(it)
+            })
+        }
+        else
+            doDamages(move)
     }
 
     /**
