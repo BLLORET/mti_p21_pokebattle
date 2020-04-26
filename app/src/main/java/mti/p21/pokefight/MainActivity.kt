@@ -41,7 +41,7 @@ class MainActivity : AbstractActivity() {
         service<PokemonModelInterface>().getAllPokemons().call {
             onSuccess = {
                 val pokemonModels = it.body()
-                    ?: throw ExceptionDuringSuccess("La liste de pokemon est vide!")
+                    ?: throw ExceptionDuringSuccess("Pokemon list is empty!")
                 listPokemon.value = pokemonModels.sortedBy { p -> p.name }
             }
             onFailure = {
