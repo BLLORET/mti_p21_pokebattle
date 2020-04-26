@@ -37,8 +37,8 @@ class BattlePokemonsFragment(a: AbstractActivity) : AbstractFragment(a) {
 
                 GameManager.currentPokemonIndex = newPokemonIndex
                 GameManager.loadCurrentPokemonInformation()
-                mainActivity.chooseAction(true)
             }
+            mainActivity.chooseAction(true)
         }
 
         recyclerView_container.layoutManager = LinearLayoutManager(mainActivity)

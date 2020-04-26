@@ -81,20 +81,22 @@ object GameManager : ViewModel() {
                     ?: throw ExceptionDuringSuccess("Body is null")
                 pokemon.loadDetails(pokemonDetail)
                 pokemonDetail.moves.forEach { moveObject ->
-                    counterAction.increment()
-                    mainActivity.service<PokeApiInterface>()
-                        .getMoveDetails(moveObject.move.name).call {
-                        onSuccess = {res ->
-                            val moveModel = res.body()
-                                ?: throw ExceptionDuringSuccess("Body is null")
-                            if (moveModel.power > 0)
-                                pokemon.moves.add(moveModel)
-                            counterAction.decrement()
-                        }
-                        onFailure = {
-                            mainActivity.toastLong("Failed to load ${moveObject.move.name}")
-                        }
-                        onAnyErrorNoArg = { counterAction.decrement() }
+                    viewModelScope.launch {
+                        counterAction.increment()
+                        mainActivity.service<PokeApiInterface>()
+                            .getMoveDetails(moveObject.move.name).call {
+                                onSuccess = {res ->
+                                    val moveModel = res.body()
+                                        ?: throw ExceptionDuringSuccess("Body is null")
+                                    if (moveModel.power > 0)
+                                        pokemon.moves.add(moveModel)
+                                    counterAction.decrement()
+                                }
+                                onFailure = {
+                                    mainActivity.toastLong("Failed to load ${moveObject.move.name}")
+                                }
+                                onAnyErrorNoArg = { counterAction.decrement() }
+                            }
                     }
                 }
                 counterAction.decrement()
@@ -126,7 +128,7 @@ object GameManager : ViewModel() {
     /**
      * Make the pokemon attack.
      */
-    private suspend fun pokemonAttackTurn(
+    private fun pokemonAttackTurn(
         pokemonAttacker: SimplifiedPokemonDetails,
         move: MoveModel?,
         pokemonDefender: SimplifiedPokemonDetails,
@@ -134,16 +136,14 @@ object GameManager : ViewModel() {
     ) {
         // TODO : il serait interessant de faire autrement qu'avec un delay ici
         // Cette fonction n'est pas bloquante
-        doDamages(pokemonAttacker, move, pokemonDefender)
+        doDamages(pokemonAttacker, move, pokemonDefender, loadPokemonInformationFunction)
         //donc ce delay a interet à etre assez long!
-        delay(delayTime)
-        loadPokemonInformationFunction()
     }
 
     /**
      * Make the current pokemon attack.
      */
-    private suspend fun currentPokemonAttackTurn(chosenMove: MoveModel) {
+    private fun currentPokemonAttackTurn(chosenMove: MoveModel) {
         pokemonAttackTurn(
             pokemonAttacker = currentPokemon,
             pokemonDefender = currentOpponent,
@@ -155,7 +155,7 @@ object GameManager : ViewModel() {
     /**
      * Make the opponent attack.
      */
-    private suspend fun currentOpponentAttackTurn() {
+    private fun currentOpponentAttackTurn() {
         pokemonAttackTurn(
             pokemonAttacker = currentOpponent,
             pokemonDefender = currentPokemon,
@@ -331,7 +331,8 @@ object GameManager : ViewModel() {
     private fun doDamages(
         pokemonAttacker: SimplifiedPokemonDetails,
         move: MoveModel?,
-        pokemonDefender: SimplifiedPokemonDetails
+        pokemonDefender: SimplifiedPokemonDetails,
+        then: () -> Unit
     ) {
         fun doDamages(currentMove: MoveModel) {
             var infoMove = "${pokemonAttacker.name} use ${currentMove.name}"
@@ -353,6 +354,10 @@ object GameManager : ViewModel() {
             damagesLive.observe(mainActivity, Observer {
                 // Protect hp to become negative
                 pokemonDefender.hp = max(0, pokemonDefender.hp - it)
+                viewModelScope.launch {
+                    delay(delayTime)
+                    then()
+                }
             })
         }
 
