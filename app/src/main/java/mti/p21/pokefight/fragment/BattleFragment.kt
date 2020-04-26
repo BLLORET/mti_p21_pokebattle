@@ -10,29 +10,25 @@ import mti.p21.pokefight.MainActivity
 
 import mti.p21.pokefight.R
 import mti.p21.pokefight.model.SimplifiedPokemonDetails
+import mti.p21.pokefight.utils.AbstractActivity
+import mti.p21.pokefight.utils.AbstractFragment
 
 /**
  * [BattleFragment] that represent the principal fragment on which the battle takes place.
  */
-
-class BattleFragment(
+class BattleFragment(a: AbstractActivity,
     private val team: List<SimplifiedPokemonDetails>,
     private val opponentTeam: List<SimplifiedPokemonDetails>
-) : Fragment() {
+) : AbstractFragment(a) {
+
+    override val layoutResource = R.layout.fragment_battle
 
     private lateinit var gameManager : GameManager
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_battle, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        gameManager = GameManager(team, opponentTeam, fragment = activity!!, resources = resources)
-        (activity as MainActivity).chooseAction(gameManager)
+
+        gameManager  = GameManager(mainActivity, team, opponentTeam, resources)
+        mainActivity.chooseAction(gameManager)
     }
 }

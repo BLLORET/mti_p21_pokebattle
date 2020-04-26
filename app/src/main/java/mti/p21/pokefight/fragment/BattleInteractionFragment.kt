@@ -1,29 +1,22 @@
 package mti.p21.pokefight.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_battle_interaction.*
 import mti.p21.pokefight.GameManager
-import mti.p21.pokefight.MainActivity
 import mti.p21.pokefight.R
+import mti.p21.pokefight.utils.AbstractActivity
+import mti.p21.pokefight.utils.AbstractFragment
 
 /**
  * [BattleInteractionFragment] that represent the fragment on which the player
  * have to chose it next action.
  */
-class BattleInteractionFragment(private val enableButtons : Boolean = false) : Fragment() {
+class BattleInteractionFragment(a: AbstractActivity,
+    private val enableButtons: Boolean = false) : AbstractFragment(a) {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_battle_interaction, container, false)
-    }
+    override val layoutResource = R.layout.fragment_battle_interaction
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,11 +34,11 @@ class BattleInteractionFragment(private val enableButtons : Boolean = false) : F
             val gameManager = it.getSerializable("GameManager") as GameManager
 
             btn_battle_attack.setOnClickListener {
-                (activity as MainActivity).onAttackButtonClicked(gameManager)
+                mainActivity.onAttackButtonClicked(gameManager)
             }
 
             btn_battle_pokemon.setOnClickListener {
-                (activity as MainActivity).onPokemonButtonClicked(gameManager)
+                mainActivity.onPokemonButtonClicked(gameManager)
             }
         }
     }
