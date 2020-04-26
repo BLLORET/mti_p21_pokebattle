@@ -16,4 +16,9 @@ class CounterAction {
             onCounterEnd?.invoke()
     }
 
+    fun reset() {
+        counter = 0
+        onCounterEnd = null
+    }
+
 }

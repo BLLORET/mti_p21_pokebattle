@@ -129,12 +129,7 @@ class LobbyFragment(a: AbstractActivity) : AbstractFragment(a) {
      * Get random opponents in the pokemon database
      */
     private fun getOpponents(): List<PokemonModel> {
-        val randomPokemons: List<PokemonModel> = pokemons.shuffled()
-        return listOf(
-            randomPokemons[0],
-            randomPokemons[1],
-            randomPokemons[2]
-        )
+        return pokemons.shuffled().subList(0, 3)
     }
 
     /**

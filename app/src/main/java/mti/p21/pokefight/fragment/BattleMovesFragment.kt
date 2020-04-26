@@ -26,21 +26,18 @@ class BattleMovesFragment(a: AbstractActivity) : AbstractFragment(a) {
         val informationTextView: TextView = mainActivity.informations_textView
         informationTextView.text = getString(R.string.interaction_select_move)
 
-        arguments?.let { bundle ->
-            val gameManager = bundle.getSerializable("GameManager") as GameManager
-            val moves = gameManager.currentPokemon.moves
+        val moves = GameManager.currentPokemon.moves
 
-            val onClickedMoveListener = View.OnClickListener {
-                gameManager.battleTurn(moves[it.tag as Int])
-                mainActivity.chooseAction(gameManager)
-            }
-
-            recyclerView_container.layoutManager = LinearLayoutManager(mainActivity)
-            recyclerView_container.adapter =
-                BattleMovesAdapter(moves, mainActivity, resources, onClickedMoveListener)
-            recyclerView_container.addItemDecoration(
-                DividerItemDecoration(activity, LinearLayoutManager.VERTICAL)
-            )
+        val onClickedMoveListener = View.OnClickListener {
+            GameManager.battleTurn(moves[it.tag as Int])
+            mainActivity.chooseAction(false)
         }
+
+        recyclerView_container.layoutManager = LinearLayoutManager(mainActivity)
+        recyclerView_container.adapter =
+            BattleMovesAdapter(moves, mainActivity, resources, onClickedMoveListener)
+        recyclerView_container.addItemDecoration(
+            DividerItemDecoration(activity, LinearLayoutManager.VERTICAL)
+        )
     }
 }

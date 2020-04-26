@@ -1,15 +1,15 @@
 package mti.p21.pokefight
 
-import android.content.res.Resources
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.*
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_battle.*
-import kotlinx.android.synthetic.main.fragment_battle_interaction.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mti.p21.pokefight.fragment.BattleFragment
+import mti.p21.pokefight.fragment.BattleInteractionFragment
 import mti.p21.pokefight.model.DamageRelations
 import mti.p21.pokefight.model.MoveModel
 import mti.p21.pokefight.model.SimplifiedPokemonDetails
@@ -18,29 +18,40 @@ import mti.p21.pokefight.utils.CounterAction
 import mti.p21.pokefight.utils.ExceptionDuringSuccess
 import mti.p21.pokefight.utils.call
 import mti.p21.pokefight.webServiceInterface.PokeApiInterface
-import java.io.Serializable
 import kotlin.math.max
 
-class GameManager (
-    private val mainActivity: AbstractActivity,
-    val team: List<SimplifiedPokemonDetails>,
-    private val opponentTeam: List<SimplifiedPokemonDetails>,
-    private val resources: Resources
-) : Serializable, ViewModel() {
+object GameManager : ViewModel() {
+
+    lateinit var mainActivity: AbstractActivity
+    lateinit var battleFragment: BattleFragment
+    lateinit var interactFragment: BattleInteractionFragment
+    lateinit var team: List<SimplifiedPokemonDetails>
+    lateinit var opponentTeam: List<SimplifiedPokemonDetails>
 
     var currentPokemonIndex = 0
     private var currentOpponentIndex = 0
-    private val delayTime = 2000L
+    private const val delayTime = 2000L
 
     private val counterAction = CounterAction()
 
-    init {
+    fun init(mainActivity: AbstractActivity,
+        team: List<SimplifiedPokemonDetails>,
+        opponentTeam: List<SimplifiedPokemonDetails>
+    ) {
+        currentPokemonIndex = 0
+        currentOpponentIndex = 0
+        this.mainActivity = mainActivity
+        this.team = team
+        this.opponentTeam = opponentTeam
+        counterAction.reset()
+    }
+
+    fun start(battleFragment: BattleFragment) {
+        this.battleFragment = battleFragment
         counterAction.onCounterEnd = {
             loadCurrentPokemonInformation()
             loadOpponentPokemonInformation()
-
-            mainActivity.btn_battle_pokemon?.isEnabled = true
-            mainActivity.btn_battle_attack?.isEnabled = true
+            interactFragment.buttons(true)
         }
 
         team.forEach { pokemon ->
@@ -205,7 +216,6 @@ class GameManager (
      * Represent the turn of battle
      */
     fun battleTurn(chosenMove: MoveModel) {
-
         viewModelScope.launch {
             actionTurn(chosenMove)
             delay(delayTime)
@@ -214,7 +224,7 @@ class GameManager (
                 // Make the pokemon image empty
                 delay(delayTime)
                 if (!gameIsFinished())
-                    mainActivity.onPokemonButtonClicked(this@GameManager)
+                    mainActivity.onPokemonButtonClicked()
                 else
                     battleOver(false)
             }
@@ -229,9 +239,8 @@ class GameManager (
 
             // Enables button when the turn is finished and set the information view
             val infoText = mainActivity.getString(R.string.interaction_select_action)
-            mainActivity.informations_textView?.text = infoText
-            mainActivity.btn_battle_attack?.isEnabled = true
-            mainActivity.btn_battle_pokemon?.isEnabled = true
+            battleFragment.informations_textView?.text = infoText
+            interactFragment.buttons(true)
         }
     }
 
@@ -425,12 +434,13 @@ class GameManager (
         }
 
         val pokemonType1ImageView: ImageView? = mainActivity.findViewById(idPokemonType1Image)
-        pokemonType1ImageView?.setImageResource(pokemon.types[0].getPictureID(resources, mainActivity))
+        pokemonType1ImageView?.setImageResource(
+            pokemon.types[0].getPictureID(mainActivity.resources, mainActivity))
 
         val pokemonType2ImageView: ImageView? = mainActivity.findViewById(idPokemonType2Image)
         pokemonType2ImageView?.setImageResource(
             if (pokemon.types.size > 1)
-                pokemon.types[1].getPictureID(resources, mainActivity)
+                pokemon.types[1].getPictureID(mainActivity.resources, mainActivity)
             else
                 0
         )

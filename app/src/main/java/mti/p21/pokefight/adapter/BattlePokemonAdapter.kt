@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_battle_pokemon_item.view.*
+import mti.p21.pokefight.GameManager
 import mti.p21.pokefight.R
 import mti.p21.pokefight.model.SimplifiedPokemonDetails
 
@@ -17,7 +18,6 @@ import mti.p21.pokefight.model.SimplifiedPokemonDetails
  * Represent an adapter to display pokemon informations to a recycler view.
  */
 class BattlePokemonAdapter(
-    private val pokemons: List<SimplifiedPokemonDetails>,
     private val context: Context,
     private val resources: Resources,
     private val onClickedPokemonListener: View.OnClickListener
@@ -51,7 +51,7 @@ class BattlePokemonAdapter(
      * @return Returns the size of the list
      */
     override fun getItemCount(): Int {
-        return pokemons.size
+        return GameManager.team.size
     }
 
     /**
@@ -62,7 +62,7 @@ class BattlePokemonAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.tag = position
 
-        val pokemon = pokemons[position]
+        val pokemon = GameManager.team[position]
 
         Glide
             .with(context)

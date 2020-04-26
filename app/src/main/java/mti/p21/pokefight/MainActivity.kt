@@ -2,7 +2,6 @@ package mti.p21.pokefight
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -70,26 +69,26 @@ class MainActivity : AbstractActivity() {
 
     override fun onFightButtonClicked(team: List<PokemonModel>, opponents: List<PokemonModel>) {
 
-        val teamSimplifiedPokemonDetails : List<SimplifiedPokemonDetails> = listOf (
+        val teamSimplifiedDetails : List<SimplifiedPokemonDetails> = listOf (
             SimplifiedPokemonDetails(team[0].name, team[0].sprite, team[0].types),
             SimplifiedPokemonDetails(team[1].name, team[1].sprite, team[1].types),
             SimplifiedPokemonDetails(team[2].name, team[2].sprite, team[2].types)
         )
 
-        val opponentSimplifiedPokemonDetails : List<SimplifiedPokemonDetails> = listOf (
+        val opponentSimplifiedDetails : List<SimplifiedPokemonDetails> = listOf (
             SimplifiedPokemonDetails(opponents[0].name, opponents[0].sprite, opponents[0].types),
             SimplifiedPokemonDetails(opponents[1].name, opponents[1].sprite, opponents[1].types),
             SimplifiedPokemonDetails(opponents[2].name, opponents[2].sprite, opponents[2].types)
         )
 
-        replaceFragment(
-            BattleFragment(this, teamSimplifiedPokemonDetails, opponentSimplifiedPokemonDetails)
-        )
+        GameManager.init(this, teamSimplifiedDetails, opponentSimplifiedDetails)
+        replaceFragment<BattleFragment>()
     }
 
     override fun onPokedexRowClicked(pokemon: PokemonModel) {
         val argumentsBundle = Bundle()
-        val simplifiedPokemon = SimplifiedPokemonDetails(pokemon.name, pokemon.sprite, pokemon.types)
+        val simplifiedPokemon =
+            SimplifiedPokemonDetails(pokemon.name, pokemon.sprite, pokemon.types)
 
         argumentsBundle.putSerializable("SimplifiedPokemon", simplifiedPokemon)
 
@@ -99,28 +98,25 @@ class MainActivity : AbstractActivity() {
         replaceFragment(detailsPokemonFragment)
     }
 
-    private fun changeInteractionZoneFragment(fragment: Fragment, gameManager: GameManager) {
-        val argumentBundle = Bundle()
-        argumentBundle.putSerializable("GameManager", gameManager)
-
-        fragment.arguments = argumentBundle
-
+    override fun chooseAction(enable: Boolean) {
+        GameManager.interactFragment = BattleInteractionFragment(this, enable)
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.interaction_container, fragment)
+            .replace(R.id.interaction_container, GameManager.interactFragment)
             .commit()
     }
 
-    override fun chooseAction(gameManager: GameManager, enableButtons: Boolean) {
-        changeInteractionZoneFragment(
-            BattleInteractionFragment(this, enableButtons), gameManager)
+    override fun onAttackButtonClicked() {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.interaction_container, BattleMovesFragment(this))
+            .commit()
     }
 
-    override fun onAttackButtonClicked(gameManager: GameManager) {
-        changeInteractionZoneFragment(BattleMovesFragment(this), gameManager)
-    }
-
-    override fun onPokemonButtonClicked(gameManager: GameManager) {
-        changeInteractionZoneFragment(BattlePokemonsFragment(this), gameManager)
+    override fun onPokemonButtonClicked() {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.interaction_container, BattlePokemonsFragment(this))
+            .commit()
     }
 }

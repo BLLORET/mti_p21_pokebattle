@@ -14,7 +14,7 @@
     <string name="btn_pokedex">POKEDEX</string>
     <string name="btn_change_pokemon">Pokemon</string>
 
-    <string name="interaction_select_action">What will you do?</string>
+    <string name="interaction_select_action">What are you going to do?</string>
     <string name="interaction_select_move">Which move?</string>
     <string name="interaction_select_pokemon">Choose a pokemon!</string>
 
