@@ -1,12 +1,5 @@
 package mti.p21.pokefight.model
 
-import android.util.Log
-import mti.p21.pokefight.utils.AbstractActivity
-import mti.p21.pokefight.utils.CallBackKt
-import mti.p21.pokefight.utils.ExceptionDuringSuccess
-import mti.p21.pokefight.utils.call
-import mti.p21.pokefight.webServiceInterface.PokeApiInterface
-import retrofit2.Callback
 import java.io.Serializable
 
 /**
@@ -27,9 +20,6 @@ class SimplifiedPokemonDetails(
     var defenseSpe: Int = 0
     var moves : MutableList<MoveModel> = arrayListOf()
 
-    var detailsCounter: Int = 0
-    var movesCounter: Int = 0
-
     /**
      * Load details from PokemonDetailsModel
      */
@@ -45,61 +35,4 @@ class SimplifiedPokemonDetails(
         hp = stats.find{ st -> st.stat.name == "hp"}!!.base_stat
     }
 
-    /**
-     * Load details in the API, and store them when the callback is called
-     */
-    fun loadCallBackPokemonDetails(mainActivity: AbstractActivity) : Callback<PokemonDetailsModel> {
-
-        return CallBackKt<PokemonDetailsModel>().apply {
-            onSuccess = {
-                val pokemon = it.body()
-                    ?: throw ExceptionDuringSuccess("Body is null")
-                loadDetails(pokemon)
-                detailsCounter--
-            }
-            onFailure = {
-                mainActivity.toastLong("Failed to load stats of $name")
-                Log.w("PokeApi", "Cannot load statistics of the $name pokemon: $it")
-            }
-            onAnyErrorNoArg = {
-                detailsCounter--
-            }
-        }
-    }
-
-    /**
-     * Load moves in the API, and store them when the callback is called
-     */
-    fun loadCallBackMoves(mainActivity: AbstractActivity) : Callback<PokemonDetailsModel> {
-        return CallBackKt<PokemonDetailsModel>().apply {
-            onSuccess = {
-                val pokemon = it.body()
-                    ?: throw ExceptionDuringSuccess("Body is null")
-                pokemon.moves.forEach { moveObject ->
-                    movesCounter++
-                    loadMove(moveObject.move.name, mainActivity)
-                }
-            }
-            onFailure = {
-                Log.w("PokeApi", "Cannot load moves of the $name pokemon")
-            }
-        }
-    }
-
-    /**
-     * Load a specific move and add it to the pokemon moves
-     */
-    private fun loadMove(name : String, mainActivity: AbstractActivity) {
-        mainActivity.service<PokeApiInterface>().getMoveDetails(name).call {
-            onSuccess = {
-                val moveModel = it.body()
-                    ?: throw ExceptionDuringSuccess("Body is null")
-                if (moveModel.power > 0)
-                    moves.add(moveModel)
-                movesCounter--
-            }
-            onFailure = { mainActivity.toastLong("Failed to load $name") }
-            onAnyErrorNoArg = { movesCounter-- }
-        }
-    }
 }
