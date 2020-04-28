@@ -27,7 +27,7 @@ class BattleMovesAdapter(
         val movePowerTextView : TextView = itemView.findViewById(R.id.itemBattleMovePower_textView)
         val moveTypeImageView : ImageView = itemView.findViewById(R.id.itemBattleMoveType_imageView)
         val moveCategoryImageView : ImageView = itemView.findViewById(R.id.itemBattleMoveCategoryAttack)
-        val movePrecisionTextView: TextView = itemView.findViewById(R.id.itemBattleMovePrecision)
+        val movePrecisionTextView: TextView = itemView.findViewById(R.id.itembattleMovePrecision_textView)
     }
 
     /**

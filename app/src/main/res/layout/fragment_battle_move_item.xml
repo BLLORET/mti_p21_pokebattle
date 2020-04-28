@@ -55,9 +55,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="32dp"
         android:text="@string/label_battle_power"
         app:layout_constraintEnd_toStartOf="@+id/itemBattleMovePrecision"
+        app:layout_constraintHorizontal_bias="0.876"
+        app:layout_constraintStart_toEndOf="@+id/itemBattleMoveName_textView"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
