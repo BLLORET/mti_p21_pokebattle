@@ -1,7 +1,7 @@
 package mti.p21.pokefight.model
 
 /**
- * Data class that hold complementary informations about a pokemon
+ * Data class that hold complementary information about a pokemon
  */
 data class PokemonDetailsModel (
     val height: Int,

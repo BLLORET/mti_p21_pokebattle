@@ -1,73 +1,70 @@
 package mti.p21.pokefight.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_lobby.*
-import mti.p21.pokefight.MainActivity
 import mti.p21.pokefight.R
 import mti.p21.pokefight.adapter.PokemonModelAdapter
 import mti.p21.pokefight.model.PokeType
 import mti.p21.pokefight.model.PokemonModel
+import mti.p21.pokefight.utils.AbstractActivity
+import mti.p21.pokefight.utils.AbstractFragment
 
 /**
  * [LobbyFragment] Represent the fragment to prepare to the next battle.
  */
-class LobbyFragment : Fragment() {
+class LobbyFragment(a: AbstractActivity) : AbstractFragment(a) {
+
+    override val layoutResource = R.layout.fragment_lobby
 
     private lateinit var pokemons: List<PokemonModel>
     private lateinit var pokemonsOpponents: List<PokemonModel>
-    private var team: MutableList<PokemonModel?> = MutableList(3) { null }
+    private lateinit var team: MutableList<PokemonModel?>
     private var selectedPokemon: PokemonModel? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_lobby, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Get the list au pokemon sorted by type1 then type2 if it exists
-        pokemons = (activity as MainActivity).data!!.sortedBy { pokemon ->
-            pokemon.types.map { type -> type.name }.reduce { acc, pokeType -> acc + pokeType}
+        // Reset after a battle
+        selectedPokemon = null
+        btn_fight.visibility = View.INVISIBLE
+        team = MutableList(3) { null }
+
+        mainActivity.executeWhenListPokemonIsLoaded(this) {
+            // Get the list au pokemon sorted by type1 then type2 if it exists
+            pokemons = it.sortedBy { pokemon ->
+                pokemon.types.map { t -> t.name }.reduce { acc, pokeType -> acc + pokeType }
+            }
+
+            btn_fight.setOnClickListener {
+                // Cast mutable? to list
+                val teamList = listOf(team[0]!!, team[1]!!, team[2]!!)
+                mainActivity.onFightButtonClicked(teamList, pokemonsOpponents)
+            }
+
+            // Opponent zone
+            pokemonsOpponents = getOpponents()
+            setFirstOpponentInformation(pokemonsOpponents[0])
+            setFirstOpponentsListeners()
+
+            // RecyclerView zone
+            val onPokemonLineClickListener = createPokemonLineClickListener()
+            recyclerView.layoutManager = LinearLayoutManager(mainActivity)
+            recyclerView.adapter =
+                PokemonModelAdapter(pokemons, mainActivity, resources, onPokemonLineClickListener)
+            recyclerView.addItemDecoration(
+                DividerItemDecoration(mainActivity, LinearLayoutManager.VERTICAL))
+
+            // Choose Pokemons Team zone
+            setChoosePokemonsTeamListeners()
         }
-
-        btn_fight.setOnClickListener {
-            // Cast mutable? to list
-            val teamList = listOf(team[0]!!, team[1]!!, team[2]!!)
-            (activity as MainActivity).onFightButtonClicked(teamList, pokemonsOpponents)
-        }
-
-        // Opponent zone
-        pokemonsOpponents = getOpponents()
-        setFirstOpponentInformations(pokemonsOpponents[0])
-        setFirstOpponentsListeners()
-
-        // RecyclerView zone
-        val onPokemonLineClickListener = createPokemonLineClickListener()
-        recyclerView.layoutManager = LinearLayoutManager(activity)
-        recyclerView.adapter = PokemonModelAdapter(pokemons, activity!!, resources,
-                                                   onPokemonLineClickListener)
-        recyclerView.addItemDecoration(
-            DividerItemDecoration(
-                activity,
-                LinearLayoutManager.VERTICAL
-            )
-        )
-
-        // Choose Pokemons Team zone
-        setChoosePokemonsTeamListeners()
     }
 
     /**
@@ -91,16 +88,16 @@ class LobbyFragment : Fragment() {
      * Set listeners on the first opponent to see help associated.
      */
     private fun setFirstOpponentsListeners() {
-        val firstOpponentTypes: List<PokeType> = pokemonsOpponents[0].types
+        val firstOpponentTypes: List<PokeType> = pokemonsOpponents.first().types
 
         firstOpponent_type1_imageView.setOnClickListener {
-            (activity as MainActivity).onTypePictureClicked(firstOpponentTypes[0])
+            mainActivity.onTypePictureClicked(firstOpponentTypes[0])
         }
 
         if (firstOpponentTypes.size > 1)
         {
             firstOpponent_type2_imageView.setOnClickListener {
-                (activity as MainActivity).onTypePictureClicked(firstOpponentTypes[1])
+                mainActivity.onTypePictureClicked(firstOpponentTypes[1])
             }
         }
     }
@@ -118,7 +115,7 @@ class LobbyFragment : Fragment() {
             team[teamNumber] = selectedPokemon
 
             Glide
-                .with(activity!!)
+                .with(mainActivity)
                 .load(selectedPokemon!!.sprite)
                 .into(imageView)
 
@@ -132,32 +129,27 @@ class LobbyFragment : Fragment() {
      * Get random opponents in the pokemon database
      */
     private fun getOpponents(): List<PokemonModel> {
-        val randomPokemons: List<PokemonModel> = pokemons.shuffled()
-        return listOf(
-            randomPokemons[0],
-            randomPokemons[1],
-            randomPokemons[2]
-        )
+        return pokemons.shuffled().subList(0, 3)
     }
 
     /**
-     * Set informations associated to the first opponent in the fragment.
+     * Set information associated to the first opponent in the fragment.
      */
-    private fun setFirstOpponentInformations(opponent: PokemonModel) {
+    private fun setFirstOpponentInformation(opponent: PokemonModel) {
         firstOpponent_name_textView.text = opponent.name
 
         Glide
-            .with(activity!!)
+            .with(mainActivity)
             .load(opponent.sprite)
             .into(firstOpponent_imageView)
 
         firstOpponent_type1_imageView.setImageResource(
-            opponent.types[0].getPictureID(resources, activity!!)
+            opponent.types[0].getPictureID(resources, mainActivity)
         )
 
         firstOpponent_type2_imageView.setImageResource(
             if (opponent.types.size > 1)
-                opponent.types[1].getPictureID(resources, activity!!)
+                opponent.types[1].getPictureID(resources, mainActivity)
             else 0
         )
     }
@@ -172,12 +164,12 @@ class LobbyFragment : Fragment() {
             selectedPokemon_name_textView.text = selectedPokemon!!.name
 
             selectedPokemon_type1_imageView.setImageResource(
-                selectedPokemon!!.types[0].getPictureID(resources, activity!!)
+                selectedPokemon!!.types[0].getPictureID(resources, mainActivity)
             )
 
             selectedPokemon_type2_imageView.setImageResource(
                 if (selectedPokemon!!.types.size > 1)
-                    selectedPokemon!!.types[1].getPictureID(resources, activity!!)
+                    selectedPokemon!!.types[1].getPictureID(resources, mainActivity)
                 else
                     0
             )

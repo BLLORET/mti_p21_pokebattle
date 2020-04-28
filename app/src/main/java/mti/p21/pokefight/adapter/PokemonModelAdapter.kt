@@ -9,6 +9,7 @@ import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.fragment_pokemon_item_list.view.*
 import mti.p21.pokefight.R
 import mti.p21.pokefight.model.PokemonModel
 
@@ -25,9 +26,9 @@ class PokemonModelAdapter(
 ) : RecyclerView.Adapter<PokemonModelAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val pokemonNameTextView: TextView = itemView.findViewById(R.id.item_pokemon_name_textView)
-        val pokemonType1ImageView: ImageView = itemView.findViewById(R.id.item_type1_imageView)
-        val pokemonType2ImageView: ImageView = itemView.findViewById(R.id.item_type2_imageView)
+        val pokemonNameTextView: TextView = itemView.item_pokemon_name_textView
+        val pokemonType1ImageView: ImageView = itemView.item_type1_imageView
+        val pokemonType2ImageView: ImageView = itemView.item_type2_imageView
     }
 
     /**
@@ -37,8 +38,7 @@ class PokemonModelAdapter(
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val rowView : View = LayoutInflater.from(context)
-                            .inflate(R.layout.fragment_pokemon_item_list,
-                                     parent, false)
+            .inflate(R.layout.fragment_pokemon_item_list, parent, false)
         rowView.setOnClickListener(onItemClickListener)
 
         return ViewHolder(rowView)
@@ -67,8 +67,10 @@ class PokemonModelAdapter(
             pokemon.types[0].getPictureID(resource, context)
         )
         holder.pokemonType2ImageView.setImageResource(
-            if (pokemon.types.size > 1) pokemon.types[1].getPictureID(resource, context)
-            else 0
+            if (pokemon.types.size > 1)
+                pokemon.types[1].getPictureID(resource, context)
+            else
+                0
         )
     }
 }

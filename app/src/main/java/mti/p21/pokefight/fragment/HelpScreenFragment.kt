@@ -1,40 +1,27 @@
 package mti.p21.pokefight.fragment
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.fragment_help_screen.*
-
 import mti.p21.pokefight.R
 import mti.p21.pokefight.adapter.HelpTypeAdapter
 import mti.p21.pokefight.model.DamageRelations
 import mti.p21.pokefight.model.PokeType
-import mti.p21.pokefight.model.TypeModel
+import mti.p21.pokefight.utils.AbstractActivity
+import mti.p21.pokefight.utils.AbstractFragment
+import mti.p21.pokefight.utils.ExceptionDuringSuccess
+import mti.p21.pokefight.utils.call
 import mti.p21.pokefight.webServiceInterface.PokeApiInterface
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 /**
  * A simple [Fragment] subclass.
  */
-class HelpScreenFragment : Fragment() {
+class HelpScreenFragment(a: AbstractActivity) : AbstractFragment(a) {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_help_screen, container, false)
-    }
+    override val layoutResource = R.layout.fragment_help_screen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -51,38 +38,21 @@ class HelpScreenFragment : Fragment() {
      * Load damage relations of a specific type in pokeApi and display them in the fragment
      */
     private fun loadDamageRelations(pokeTypeName: String) {
-        val service = Retrofit.Builder()
-            .baseUrl("https://pokeapi.co/api/v2/")
-            .addConverterFactory(
-                GsonConverterFactory.create(GsonBuilder().create())
-            )
-            .build()
-            .create(PokeApiInterface::class.java)
-
-        val wsServiceCallback = object: Callback<TypeModel> {
-            override fun onFailure(call: Call<TypeModel>, t: Throwable) {
-                Log.w("PokeApi", "Cannot load type $pokeTypeName")
-            }
-
-            override fun onResponse(call: Call<TypeModel>, response: Response<TypeModel>) {
-                Log.w("Response: ", response.code().toString())
-                if (response.code() == 200) {
-                    response.body()?.let { typeModel ->
-                        setGridViewAdapters(typeModel.damage_relations)
-                    }
-                }
+        service<PokeApiInterface>().getDamageRelations(pokeTypeName).call {
+            onSuccess = {
+                val typeModel = it.body()
+                    ?: throw ExceptionDuringSuccess("Body is null!")
+                setGridViewAdapters(typeModel.damage_relations)
             }
         }
-
-        service.getDamageRelations(pokeTypeName).enqueue(wsServiceCallback)
     }
 
     /**
      * Set a grid view adapter with the good list of pokeType
      */
     private fun setGridViewAdapter(recyclerView: RecyclerView, damages: List<PokeType>) {
-        recyclerView.layoutManager = GridLayoutManager(activity!!, 3)
-        recyclerView.adapter = HelpTypeAdapter(damages, activity!!, resources)
+        recyclerView.layoutManager = GridLayoutManager(mainActivity, 3)
+        recyclerView.adapter = HelpTypeAdapter(damages, mainActivity, resources)
     }
 
     /**

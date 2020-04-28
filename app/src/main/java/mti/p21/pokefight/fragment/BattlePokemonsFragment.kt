@@ -1,63 +1,51 @@
 package mti.p21.pokefight.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.fragment_battle.*
 import kotlinx.android.synthetic.main.fragment_list.*
 import mti.p21.pokefight.GameManager
-import mti.p21.pokefight.MainActivity
 import mti.p21.pokefight.R
 import mti.p21.pokefight.adapter.BattlePokemonAdapter
-import mti.p21.pokefight.model.SimplifiedPokemonDetails
+import mti.p21.pokefight.utils.AbstractActivity
+import mti.p21.pokefight.utils.AbstractFragment
 
 /**
  * [BattlePokemonsFragment] that represent the fragment to choose the new pokemon to call.
  */
-class BattlePokemonsFragment() : Fragment() {
+class BattlePokemonsFragment(a: AbstractActivity) : AbstractFragment(a) {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_list, container, false)
-    }
+    override val layoutResource = R.layout.fragment_list
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.let { bundle ->
-            val gameManager = bundle.getSerializable("GameManager") as GameManager
-            val pokemons: List<SimplifiedPokemonDetails> = gameManager.team
+        GameManager.battleFragment.informations_textView.text =
+            getString(R.string.interaction_select_pokemon)
 
-            val informationTextView: TextView = activity!!.findViewById(R.id.informations_textView)
-            informationTextView.text = getString(R.string.interaction_select_pokemon)
+        val onClickedPokemonListener = View.OnClickListener {
+            val newPokemonIndex = it.tag as Int
 
-            val onClickedPokemonListener = View.OnClickListener {
-                val newPokemonIndex = it.tag as Int
+            if (GameManager.currentPokemonIndex != newPokemonIndex &&
+                GameManager.team[newPokemonIndex].hp != 0) {
 
-                if (gameManager.currentPokemonIndex != newPokemonIndex &&
-                    gameManager.team[newPokemonIndex].hp != 0) {
 
-                    gameManager.currentPokemonIndex = newPokemonIndex
-                    gameManager.loadCurrentPokemonInformations()
-                    (activity as MainActivity).chooseAction(gameManager, true)
-                }
+                GameManager.battleFragment.informations_textView.text =
+                    getString(R.string.interaction_select_action)
+
+                GameManager.currentPokemonIndex = newPokemonIndex
+                GameManager.loadCurrentPokemonInformation()
             }
-
-            recyclerView_container.layoutManager = LinearLayoutManager(activity)
-            recyclerView_container.adapter = BattlePokemonAdapter(pokemons, activity!!, resources,
-                                                                  onClickedPokemonListener)
-            recyclerView_container.addItemDecoration(
-                DividerItemDecoration(
-                    activity,
-                    LinearLayoutManager.VERTICAL
-                )
-            )
+            mainActivity.chooseAction(true)
         }
+
+        recyclerView_container.layoutManager = LinearLayoutManager(mainActivity)
+        recyclerView_container.adapter =
+            BattlePokemonAdapter(mainActivity, resources, onClickedPokemonListener)
+        recyclerView_container.addItemDecoration(
+            DividerItemDecoration(mainActivity, LinearLayoutManager.VERTICAL)
+        )
     }
 }

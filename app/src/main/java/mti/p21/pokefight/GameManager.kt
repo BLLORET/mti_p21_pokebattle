@@ -1,55 +1,66 @@
 package mti.p21.pokefight
 
-import android.content.res.Resources
 import android.util.Log
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.fragment_battle.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import mti.p21.pokefight.model.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.io.Serializable
+import mti.p21.pokefight.fragment.BattleFragment
+import mti.p21.pokefight.fragment.BattleInteractionFragment
+import mti.p21.pokefight.model.DamageRelations
+import mti.p21.pokefight.model.MoveModel
+import mti.p21.pokefight.model.SimplifiedPokemonDetails
+import mti.p21.pokefight.utils.AbstractActivity
+import mti.p21.pokefight.utils.CounterAction
+import mti.p21.pokefight.utils.ExceptionDuringSuccess
+import mti.p21.pokefight.utils.call
+import mti.p21.pokefight.webServiceInterface.PokeApiInterface
 import kotlin.math.max
 
-class GameManager (
-    val team: List<SimplifiedPokemonDetails>,
-    private val opponentTeam: List<SimplifiedPokemonDetails>,
-    var currentPokemonIndex: Int = 0,
-    private var currentOpponentIndex: Int = 0,
-    private val fragment: FragmentActivity,
-    private val resources: Resources
-) : Serializable, ViewModel() {
+object GameManager : ViewModel() {
 
-    init {
+    lateinit var mainActivity: AbstractActivity
+    lateinit var battleFragment: BattleFragment
+    lateinit var interactFragment: BattleInteractionFragment
+    lateinit var team: List<SimplifiedPokemonDetails>
+    lateinit var opponentTeam: List<SimplifiedPokemonDetails>
+
+    var currentPokemonIndex = 0
+    private var currentOpponentIndex = 0
+    private const val delayTime = 2000L
+
+    private val counterAction = CounterAction()
+
+    fun init(mainActivity: AbstractActivity,
+        team: List<SimplifiedPokemonDetails>,
+        opponentTeam: List<SimplifiedPokemonDetails>
+    ) {
+        currentPokemonIndex = 0
+        currentOpponentIndex = 0
+        this.mainActivity = mainActivity
+        this.team = team
+        this.opponentTeam = opponentTeam
+        counterAction.reset()
+    }
+
+    fun start(battleFragment: BattleFragment) {
+        this.battleFragment = battleFragment
+        counterAction.onCounterEnd = {
+            loadCurrentPokemonInformation()
+            loadOpponentPokemonInformation()
+            interactFragment.buttons(true)
+        }
+
         team.forEach { pokemon ->
-            pokemon.detailsCounter++
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackPokemonDetails(fragment))
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackMoves(fragment))
+            counterAction.increment()
+            loadOnPokemonAPI(pokemon)
         }
         opponentTeam.forEach { pokemon ->
-            pokemon.detailsCounter++
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackPokemonDetails(fragment))
-            loadOnPokemonAPI(pokemon, pokemon.loadCallBackMoves(fragment))
-        }
-
-        // Coroutine wait for loading
-        viewModelScope.launch {
-            while (!team.all { it.detailsCounter == 0 && it.movesCounter == 0 } ||
-                   !opponentTeam.all { it.detailsCounter == 0 && it.movesCounter == 0}) {
-                delay(500)
-            }
-            loadCurrentPokemonInformations()
-            loadOpponentPokemonInformations()
-
-            fragment.findViewById<Button>(R.id.btn_battle_pokemon).isEnabled = true
-            fragment.findViewById<Button>(R.id.btn_battle_attack).isEnabled = true
+            counterAction.increment()
+            loadOnPokemonAPI(pokemon)
         }
     }
 
@@ -57,19 +68,46 @@ class GameManager (
     val currentPokemon: SimplifiedPokemonDetails
         get() = team[currentPokemonIndex]
 
-    val currentOpponent: SimplifiedPokemonDetails
+    private val currentOpponent: SimplifiedPokemonDetails
         get() = opponentTeam[currentOpponentIndex]
 
     /**
      * Use a Callback function on the pokemon API to a specif pokemon
      */
-    private fun loadOnPokemonAPI(
-        pokemon: SimplifiedPokemonDetails,
-        loadFunction: Callback<PokemonDetailsModel>
-    ) {
-        pokemon.getPokeAPIService().getPokemonDetails(pokemon.name).enqueue(
-            loadFunction
-        )
+    private fun loadOnPokemonAPI(pokemon: SimplifiedPokemonDetails) {
+        mainActivity.service<PokeApiInterface>().getPokemonDetails(pokemon.name).call {
+            onSuccess = {
+                val pokemonDetail = it.body()
+                    ?: throw ExceptionDuringSuccess("Body is null")
+                pokemon.loadDetails(pokemonDetail)
+                pokemonDetail.moves.forEach { moveObject ->
+                    viewModelScope.launch {
+                        counterAction.increment()
+                        mainActivity.service<PokeApiInterface>()
+                            .getMoveDetails(moveObject.move.name).call {
+                                onSuccess = {res ->
+                                    val moveModel = res.body()
+                                        ?: throw ExceptionDuringSuccess("Body is null")
+                                    if (moveModel.power > 0)
+                                        pokemon.moves.add(moveModel)
+                                    counterAction.decrement()
+                                }
+                                onFailure = {
+                                    mainActivity.toastLong("Failed to load ${moveObject.move.name}")
+                                }
+                                onAnyErrorNoArg = { counterAction.decrement() }
+                            }
+                    }
+                }
+                counterAction.decrement()
+            }
+            onFailure = {
+                mainActivity.toastLong("Failed to load stats of ${pokemon.name}")
+                Log.w("PokeApi",
+                    "Cannot load statistics of the ${pokemon.name} pokemon: $it")
+            }
+            onAnyErrorNoArg = { counterAction.decrement() }
+        }
     }
 
     /**
@@ -88,148 +126,250 @@ class GameManager (
     }
 
     /**
-     * Represent the turn of battle
+     * Make the pokemon attack.
      */
-    fun battleTurn(chosenMove: MoveModel, fragment: FragmentActivity) {
+    private fun pokemonAttackTurn(
+        pokemonAttacker: SimplifiedPokemonDetails,
+        move: MoveModel?,
+        pokemonDefender: SimplifiedPokemonDetails,
+        loadPokemonInformationFunction: () -> Unit
+    ) {
+        // TODO : il serait interessant de faire autrement qu'avec un delay ici
+        // Cette fonction n'est pas bloquante
+        doDamages(pokemonAttacker, move, pokemonDefender, loadPokemonInformationFunction)
+        //donc ce delay a interet à etre assez long!
+    }
 
-        viewModelScope.launch {
-            val delayTime = 2000L
-
-            // FIXME with the move of enemy
-            val opponentMove: MoveModel = chosenMove
-
-            // Action turn
-            if (currentPokemon.speed >= currentOpponent.speed) {
-                doDamages(currentPokemon, chosenMove, currentOpponent, fragment, true)
-
-                delay(delayTime)
-
-                if (currentOpponent.hp > 0) {
-                    doDamages(currentOpponent, opponentMove, currentPokemon, fragment, false)
-                }
-            } else {
-                doDamages(currentOpponent, opponentMove, currentPokemon, fragment, false)
-                delay(delayTime)
-                if (currentPokemon.hp > 0) {
-                    doDamages(currentPokemon, chosenMove, currentOpponent, fragment, true)
-                }
-            }
-            delay(delayTime)
-
-            val isFinished: Boolean = gameIsFinished()
-
-            if (currentPokemon.hp == 0) {
-                val informationTextView: TextView = fragment.findViewById(R.id.informations_textView)
-                val infoDead = "${currentPokemon.name} is dead."
-                informationTextView.text = infoDead
-                delay(delayTime)
-                if (!isFinished)
-                    (fragment as MainActivity).onPokemonButtonClicked(this@GameManager)
-                else {
-                    val lostString = "You have lost the battle..."
-                    informationTextView.text = lostString
-                    delay(delayTime * 4)
-                    (fragment as MainActivity).supportFragmentManager.popBackStack()
-                }
-            }
-            else if (currentOpponent.hp == 0) {
-                val informationTextView: TextView = fragment.findViewById(R.id.informations_textView)
-                val infoDead = "${currentOpponent.name} is dead."
-                informationTextView.text = infoDead
-
-                delay(delayTime)
-                if (!isFinished) {
-                    setNextOpponent()
-                    loadOpponentPokemonInformations()
-                } else {
-                    val wonString = "You have won the battle..."
-                    informationTextView.text = wonString
-                    delay(delayTime * 4)
-                    (fragment as MainActivity).supportFragmentManager.popBackStack()
-                }
-            }
-
-            fragment.findViewById<Button>(R.id.btn_battle_attack).isEnabled = true
-            fragment.findViewById<Button>(R.id.btn_battle_pokemon).isEnabled = true
+    /**
+     * Make the current pokemon attack.
+     */
+    private fun currentPokemonAttackTurn(chosenMove: MoveModel) {
+        pokemonAttackTurn(
+            pokemonAttacker = currentPokemon,
+            pokemonDefender = currentOpponent,
+            move = chosenMove) {
+            loadOpponentPokemonInformation()
         }
     }
 
+    /**
+     * Make the opponent attack.
+     */
+    private fun currentOpponentAttackTurn() {
+        pokemonAttackTurn(
+            pokemonAttacker = currentOpponent,
+            pokemonDefender = currentPokemon,
+            move = null) {
+            loadCurrentPokemonInformation()
+        }
+    }
+
+    /**
+     * Make pokemon hit them
+     */
+    private suspend fun actionTurn(chosenMove: MoveModel) {
+        if (currentPokemon.speed >= currentOpponent.speed) {
+            currentPokemonAttackTurn(chosenMove)
+            delay(delayTime)
+            if (currentOpponent.hp > 0)
+                currentOpponentAttackTurn()
+        } else {
+            currentOpponentAttackTurn()
+            delay(delayTime)
+            if (currentPokemon.hp > 0)
+                currentPokemonAttackTurn(chosenMove)
+        }
+    }
+
+    /**
+     * Determine if a pokemon is dead or alive, display information if he is dead
+     */
+    private fun checkPokemonIsDead(
+        pokemon: SimplifiedPokemonDetails,
+        idPokemonImage: Int
+    ) : Boolean {
+        if (pokemon.hp != 0) {
+            return false
+        }
+        val infoDead = "${pokemon.name} is dead."
+        mainActivity.informations_textView?.text = infoDead
+        mainActivity.findViewById<ImageView>(idPokemonImage)?.setImageResource(0)
+
+        return true
+    }
+
+    /**
+     * Make the battle over and display a message to explain the player have lost or won.
+     */
+    private suspend fun battleOver(win: Boolean) {
+        val infoText =
+            if (win)
+                mainActivity.getString(R.string.label_won)
+            else
+                mainActivity.getString(R.string.label_lost)
+        mainActivity.informations_textView?.text = infoText
+        delay(delayTime * 4)
+        mainActivity.backActivity()
+    }
+
+    /**
+     * Represent the turn of battle
+     */
+    fun battleTurn(chosenMove: MoveModel) {
+        viewModelScope.launch {
+            actionTurn(chosenMove)
+            delay(delayTime)
+
+            if (checkPokemonIsDead(currentPokemon, R.id.currentPokemon_imageView)) {
+                // Make the pokemon image empty
+                delay(delayTime)
+                if (!gameIsFinished())
+                    mainActivity.onPokemonButtonClicked()
+                else
+                    battleOver(false)
+            }
+            else if (checkPokemonIsDead(currentOpponent, R.id.opponentPokemon_imageView)) {
+                delay(delayTime)
+                if (!gameIsFinished()) {
+                    setNextOpponent()
+                    loadOpponentPokemonInformation()
+                } else
+                    battleOver(true)
+            }
+
+            // Enables button when the turn is finished and set the information view
+            val infoText = mainActivity.getString(R.string.interaction_select_action)
+            battleFragment.informations_textView?.text = infoText
+            interactFragment.buttons(true)
+        }
+    }
+
+    /**
+     * Load damages relation from a pokeType
+     */
+    private fun loadDamageRelations(pokeTypeName: String) : LiveData<DamageRelations> {
+        val liveData = MutableLiveData<DamageRelations>()
+        mainActivity.service<PokeApiInterface>().getDamageRelations(pokeTypeName).call {
+            onSuccess = {
+                liveData.value = it.body()?.damage_relations
+                    ?: throw ExceptionDuringSuccess("Body is null!")
+            }
+        }
+        return liveData
+    }
+
+    /**
+     * Return the real damages of a move against another pokemon from an attacker.
+     */
     private fun getDamagesOfMove(
         pokemonAttacker: SimplifiedPokemonDetails,
         pokemonDefender: SimplifiedPokemonDetails,
-        move: MoveModel,
-        damageRelations: DamageRelations
-    ): Int {
-        var damages: Int = calculateDamage(
-            pokemonAttacker = pokemonAttacker,
-            pokemonDefender = pokemonDefender,
-            move = move,
-            damageRelations = damageRelations,
-            defenderType = pokemonDefender.types[0].name
-        )
-
-        if (pokemonDefender.types.size > 1) {
-            damages = minOf(
-                damages,
-                calculateDamage(
-                    pokemonAttacker = pokemonAttacker,
-                    pokemonDefender = pokemonDefender,
-                    move = move,
-                    damageRelations = damageRelations,
-                    defenderType = pokemonDefender.types[1].name
-                )
+        move: MoveModel
+    ): LiveData<Int> {
+        val liveInt = MutableLiveData<Int>()
+        val liveDamageRelations = loadDamageRelations(move.type.name)
+        liveDamageRelations.observe(mainActivity, Observer {
+            var damages: Int = calculateDamage(
+                pokemonAttacker = pokemonAttacker,
+                pokemonDefender = pokemonDefender,
+                move = move,
+                damageRelations = it,
+                defenderType = pokemonDefender.types[0].name
             )
-        }
 
-        return damages
+            if (pokemonDefender.types.size > 1) {
+                damages = minOf(
+                    damages,
+                    calculateDamage(
+                        pokemonAttacker = pokemonAttacker,
+                        pokemonDefender = pokemonDefender,
+                        move = move,
+                        damageRelations = it,
+                        defenderType = pokemonDefender.types[1].name
+                    )
+                )
+            }
+            liveInt.value = damages
+        })
+        return liveInt
     }
 
+    /**
+     * Get the most powerful move of the IA against us.
+     */
+    private fun getBetterIAMove(
+        pokemonAttacker: SimplifiedPokemonDetails,
+        pokemonDefender: SimplifiedPokemonDetails
+    ) : LiveData<MoveModel> {
+        val liveMove = MutableLiveData<MoveModel>()
+
+        val counter = CounterAction()
+
+        val models: List<Pair<MoveModel, LiveData<Int>>> = pokemonAttacker.moves.toList()
+            .map {move ->
+                counter.increment()
+                val liveInt =
+                    getDamagesOfMove(pokemonAttacker, pokemonDefender, move)
+
+                liveInt.observe(mainActivity, Observer {
+                    counter.decrement()
+                })
+                move to liveInt
+            }
+
+        counter.onCounterEnd = {
+            liveMove.value = models.maxBy { it.second.value ?: -1 }?.first
+        }
+
+        return liveMove
+    }
+
+    /**
+     * Apply damages from a pokemon to another with a specific move.
+     * If move is null, the algorithm choose the most powerful attack.
+     */
     private fun doDamages(
         pokemonAttacker: SimplifiedPokemonDetails,
-        move: MoveModel,
+        move: MoveModel?,
         pokemonDefender: SimplifiedPokemonDetails,
-        fragment: FragmentActivity,
-        isPlayer: Boolean) {
+        then: () -> Unit
+    ) {
+        fun doDamages(currentMove: MoveModel) {
+            var infoMove = "${pokemonAttacker.name} use ${currentMove.name}"
+            val infoTextView: TextView? = mainActivity.informations_textView
 
-        val informationTextView: TextView = fragment.findViewById(R.id.informations_textView)
-        val infoMove = "${pokemonAttacker.name} use ${move.name}"
-        informationTextView.text = infoMove
-
-        val attackerType: String = move.type.name
-
-
-        // pokeAPI is attached to a pokemon
-        pokemonAttacker.getPokeAPIService().getDamageRelations(attackerType).enqueue(
-            object : Callback<TypeModel> {
-                override fun onFailure(call: Call<TypeModel>, t: Throwable) {
-                    Log.w("PokeApi", "Cannot load type $attackerType")
-                }
-
-                override fun onResponse(call: Call<TypeModel>, response: Response<TypeModel>) {
-                    Log.w("Response: ", response.code().toString())
-                    if (response.code() == 200) {
-                        response.body()?.let { typeModel ->
-
-                            val damages = getDamagesOfMove(
-                                pokemonAttacker = pokemonAttacker,
-                                pokemonDefender = pokemonDefender,
-                                move = move,
-                                damageRelations = typeModel.damage_relations
-                            )
-
-                            // Protect hp to become negative
-                            pokemonDefender.hp = max(0, pokemonDefender.hp - damages)
-
-                            if (isPlayer) {
-                                loadOpponentPokemonInformations()
-                            } else {
-                                loadCurrentPokemonInformations()
-                            }
-                        }
-                    }
-                }
+            // Check if the move failed
+            val randomNumber = (0..100).shuffled().first()
+            if (randomNumber > currentMove.accuracy) {
+                infoMove = "${pokemonAttacker.name} failed its move ${currentMove.name}"
+                infoTextView?.text = infoMove
+                return
             }
-        )
+
+            infoTextView?.text = infoMove
+
+            val damagesLive: LiveData<Int> =
+                getDamagesOfMove(pokemonAttacker, pokemonDefender, currentMove)
+
+            damagesLive.observe(mainActivity, Observer {
+                // Protect hp to become negative
+                pokemonDefender.hp = max(0, pokemonDefender.hp - it)
+                viewModelScope.launch {
+                    delay(delayTime)
+                    then()
+                }
+            })
+        }
+
+        // If move is null because it an IA, we find it's move
+        if (move == null) {
+            val moveModel = getBetterIAMove(pokemonAttacker, pokemonDefender)
+            moveModel.observe(mainActivity, Observer {
+                doDamages(it)
+            })
+        }
+        else
+            doDamages(move)
     }
 
     /**
@@ -258,11 +398,17 @@ class GameManager (
         val defTypeModifier = getDefenderTypeModifier(damageRelations, defenderType)
         val physicalDamage : Boolean = move.damage_class.name == "physical"
 
-        val attackModifier: Float = if (physicalDamage) pokemonAttacker.attack.toFloat()
-                                    else pokemonAttacker.attackSpe.toFloat()
+        val attackModifier: Float =
+            if (physicalDamage)
+                pokemonAttacker.attack.toFloat()
+            else
+                pokemonAttacker.attackSpe.toFloat()
 
-        val defenseModifier: Float = if (physicalDamage) pokemonDefender.defense.toFloat()
-                                     else pokemonDefender.defenseSpe.toFloat()
+        val defenseModifier: Float =
+            if (physicalDamage)
+                pokemonDefender.defense.toFloat()
+            else
+                pokemonDefender.defenseSpe.toFloat()
 
 
         return ((attackModifier / 10F + move.power - defenseModifier) * defTypeModifier).toInt()
@@ -270,7 +416,7 @@ class GameManager (
 
 
     /**
-     * Load informations of the selected pokemon with correct ids
+     * Load information of the selected pokemon with correct ids
      */
     private fun loadPokemonInformation(
         pokemon: SimplifiedPokemonDetails,
@@ -280,28 +426,35 @@ class GameManager (
         idPokemonType1Image: Int,
         idPokemonType2Image: Int
     ) {
-        fragment.findViewById<TextView>(idPokemonName).text = pokemon.name
-        fragment.findViewById<TextView>(idPokemonHP).text = pokemon.hp.toString()
+        mainActivity.findViewById<TextView>(idPokemonName)?.text = pokemon.name
+        mainActivity.findViewById<TextView>(idPokemonHP)?.text = pokemon.hp.toString()
 
-        Glide
-            .with(fragment)
-            .load(pokemon.sprite)
-            .into(fragment.findViewById(idPokemonImage))
+        val pokemonImageView: ImageView? = mainActivity.findViewById(idPokemonImage)
 
-        val pokemonType1ImageView: ImageView = fragment.findViewById(idPokemonType1Image)
-        pokemonType1ImageView.setImageResource(pokemon.types[0].getPictureID(resources, fragment))
+        if (pokemonImageView != null) {
+            Glide
+                .with(mainActivity)
+                .load(pokemon.sprite)
+                .into(pokemonImageView)
+        }
 
-        val pokemonType2ImageView: ImageView = fragment.findViewById(idPokemonType2Image)
-        pokemonType2ImageView.setImageResource(
-            if (pokemon.types.size > 1) pokemon.types[1].getPictureID(resources, fragment)
-            else 0
+        val pokemonType1ImageView: ImageView? = mainActivity.findViewById(idPokemonType1Image)
+        pokemonType1ImageView?.setImageResource(
+            pokemon.types[0].getPictureID(mainActivity.resources, mainActivity))
+
+        val pokemonType2ImageView: ImageView? = mainActivity.findViewById(idPokemonType2Image)
+        pokemonType2ImageView?.setImageResource(
+            if (pokemon.types.size > 1)
+                pokemon.types[1].getPictureID(mainActivity.resources, mainActivity)
+            else
+                0
         )
     }
 
     /**
      * Load information about the current selected pokemon,
      */
-    fun loadCurrentPokemonInformations() {
+    fun loadCurrentPokemonInformation() {
         loadPokemonInformation(
             pokemon = currentPokemon,
             idPokemonHP = R.id.currentPokemonHP_textView,
@@ -313,9 +466,9 @@ class GameManager (
     }
 
     /**
-     * Load informations about the current opponent
+     * Load information about the current opponent
      */
-    private fun loadOpponentPokemonInformations() {
+    private fun loadOpponentPokemonInformation() {
         loadPokemonInformation(
             pokemon = currentOpponent,
             idPokemonHP = R.id.opponentPokemonHP_textView,
