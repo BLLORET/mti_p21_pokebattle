@@ -134,10 +134,7 @@ object GameManager : ViewModel() {
         pokemonDefender: SimplifiedPokemonDetails,
         loadPokemonInformationFunction: () -> Unit
     ) {
-        // TODO : il serait interessant de faire autrement qu'avec un delay ici
-        // Cette fonction n'est pas bloquante
         doDamages(pokemonAttacker, move, pokemonDefender, loadPokemonInformationFunction)
-        //donc ce delay a interet à etre assez long!
     }
 
     /**
